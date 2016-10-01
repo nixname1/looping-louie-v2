@@ -22,6 +22,8 @@ void ll_system_game_start(void);
 void ll_system_game_stop(void);
 
 /** general functions */
+void ll_system_rand_init(void);
+
 void delay_ms(uint32_t ms);
 void delay_us(uint32_t us);
 void delay(uint32_t ticks);

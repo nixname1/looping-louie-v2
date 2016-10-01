@@ -5,7 +5,7 @@
 
 void ll_motor_init(void);
 void ll_motor_deinit(void);
-int ll_motor_set_speed(int dir, int val);
+int ll_motor_set_new_random_speed(void);
 void ll_motor_stop(void);
 
 

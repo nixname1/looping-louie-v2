@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "stm32f4xx.h"
 
 #include "ll_system.h"
@@ -16,6 +18,7 @@ void ll_system_init()
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/SYSTICK_TIMER_SPEED);
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
+  ll_system_rand_init();
   // init the reset switch
   //ll_reset_switch_init();
 
@@ -54,6 +57,36 @@ void ll_system_game_stop()
 {
   // TODO: implement
 }
+
+/**
+ *
+ */
+
+void ll_system_rand_init()
+{
+  uint32_t adc_val;
+  uint32_t tmp;
+  uint32_t i;
+
+  RCC->APB2ENR |= RCC_APB2ENR_ADC1EN; // clock adc1
+  ADC1->CR2 |= ADC_CR2_ADON; // enable adc
+  ADC->CCR |= ADC_CCR_TSVREFE; // enable temperature sensor
+  ADC1->SQR1 = ADC_SQR1_SQ16; // internal temp. sensor channel
+  ADC1->CR2 |= ADC_CR2_SWSTART; // start adc one time
+  while(!(ADC1->SR & ADC_SR_EOC)); // wait for adc
+
+  tmp = ADC1->DR;
+  for(i = 0; i < tmp/10; i++)
+  {
+	ADC1->CR2 |= ADC_CR2_SWSTART; // start adc one time
+	while(!(ADC1->SR & ADC_SR_EOC)); // wait for adc
+
+	adc_val = ADC1->DR;
+	srand(adc_val);
+  }
+
+}
+
 
 /**
  * @brief wait for X cycles of selected systick
