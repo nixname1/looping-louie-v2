@@ -90,7 +90,7 @@ SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 4; // 2MHz input clock
   RCC_OscInitStruct.PLL.PLLN = 192; // multiply input clock with 192 == 384 MHz
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV8; // divide with 8 -> 96MHz
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4; // divide with 8 -> 96MHz
   RCC_OscInitStruct.PLL.PLLQ = 8; /* To make USB work. */
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   HAL_RCC_OscConfig(&RCC_OscInitStruct);
