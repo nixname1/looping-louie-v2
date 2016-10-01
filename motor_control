@@ -1,0 +1,15 @@
+forward MOTOR <<--
+
+ 84 - 119 	Fullspeed
+120 - 136	lower speed
+123 - 125	same speed (middle?)
+
+138 - 141	fiepen 
+
+141 - 200	leises fiepen
+
+
+
+backward MOTOR -->>
+
+
