@@ -129,8 +129,4 @@ SysTick_Handler(void)
   {
 	delay_timer--;
   }
-
-#if defined(USE_HAL_DRIVER)
-  //HAL_IncTick();
-#endif
 }
