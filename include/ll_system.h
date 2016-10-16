@@ -14,6 +14,19 @@
 #define SYSTICK_SPEED_10ns	(96000000) // every clock
 #define SYSTICK_TIMER_SPEED SYSTICK_SPEED_1us
 
+enum LL_STEP
+{
+  LL_STEP_GAME_INIT,
+  LL_STEP_GAME_WAIT_FOR_START,
+  LL_STEP_GAME_RUNNING,
+  LL_STEP_GAME_END
+};
+
+struct ll_globals
+{
+  enum LL_STEP step;
+}g;
+
 void ll_system_init(void);
 
 /** round handling */

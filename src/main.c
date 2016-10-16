@@ -19,10 +19,16 @@ main (int argc, char* argv[])
 
   trace_printf("SystemCoreClock: %lu\n", SystemCoreClock);
 
+//  while (1)
+//  {
+//	switch()
+//	{
+//	  case
+//
+//	  default:
+//
+//	}
 
-  while (1)
-  {
-	//ll_motor_set_new_random_speed();
-  }
+  while(1);
+
 }
-

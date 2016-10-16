@@ -94,8 +94,7 @@ void ll_system_rand_init()
  */
 void delay(volatile uint32_t ticks)
 {
-  delay_timer = ticks;
-  while(delay_timer);
+  while(ticks--);
 }
 /**
  * @brief stop the code execution for x milliseconds

@@ -1,4 +1,8 @@
 #include "stm32f4xx.h"
+#include "diag/Trace.h"
+
+#include <stdlib.h>
+
 
 #include "ll_system.h"
 #include "ll_motor.h"
@@ -23,7 +27,22 @@ void ll_motor_init()
   TIM3->ARR = 20000 -1; // 1000 clocks per ms
   TIM3->CCMR1 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1; // pwm mode 1
   TIM3->CCER = TIM_CCER_CC1E; // enable ccr
-  TIM3->CR1 |= TIM_CR1_OPM & TIM_CR1_CEN; // enable timer
+  TIM3->CR1 |= TIM_CR1_CEN; // enable timer
+}
+
+/**
+ * @brief
+ * @param val	expects the speed of the motor in precent
+ * @param dir	the direction of the motor
+ * 				0=forward 1=backward
+ * @retval		0 on success, -1 on failure
+ */
+int ll_motor_set_speed(uint32_t val, uint32_t dir)
+{
+  UNUSED(val);
+  UNUSED(dir);
+
+  return 0;
 }
 
 /**
@@ -35,12 +54,8 @@ void ll_motor_init()
  */
 int ll_motor_set_new_random_speed()
 {
-  uint32_t i;
-  uint32_t val;
-  uint32_t direction;
-
-
-  val = rand();
+  uint32_t val = 50;
+  uint32_t direction = 1;
 
   if(direction)
   {

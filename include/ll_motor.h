@@ -6,6 +6,7 @@
 void ll_motor_init(void);
 void ll_motor_deinit(void);
 int ll_motor_set_new_random_speed(void);
+int ll_motor_set_speed(uint32_t val, uint32_t dir);
 void ll_motor_stop(void);
 
 

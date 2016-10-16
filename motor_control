@@ -1,16 +1,14 @@
 forward MOTOR <<--
 
- 84 - 119 	Fullspeed
-120 - 137	lower speed
-
-138 - 141	fiepen 
+1340 - 840
 
 141 - 200	leises fiepen
 
 
-use range of 119 (full speed) to 137 and 150 for stop
+use range of 119 (full speed) to 1370 and 1420 for stop
 
 
 backward MOTOR -->>
 
+1650 - 2040 low to full speed 
 
