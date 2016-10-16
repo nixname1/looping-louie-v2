@@ -3,12 +3,15 @@
 
 #include "stm32f411xe.h"
 
-#define SYSTICK_SPEED_1ms 	(1000)      // every 100.000th clock
-#define SYSTICK_SPEED_100us (10000)     // every 10.000th clock
-#define SYSTICK_SPEED_10us	(100000)    // every 1000th clock
-#define SYSTICK_SPEED_1us	(1000000)   // every 100th clock
-#define SYSTICK_SPEED_100ns	(10000000)  // every 10th clock
-#define SYSTICK_SPEED_10ns	(100000000) // every clock
+/**
+ * one clock is 10,4166 ns
+ */
+#define SYSTICK_SPEED_1ms 	(960)      // every 100.000th clock
+#define SYSTICK_SPEED_100us (9600)     // every 10.000th clock
+#define SYSTICK_SPEED_10us	(96000)    // every 1000th clock
+#define SYSTICK_SPEED_1us	(960000)   // every 100th clock
+#define SYSTICK_SPEED_100ns	(9600000)  // every 10th clock
+#define SYSTICK_SPEED_10ns	(96000000) // every clock
 #define SYSTICK_TIMER_SPEED SYSTICK_SPEED_1us
 
 void ll_system_init(void);
