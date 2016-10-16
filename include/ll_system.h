@@ -11,9 +11,8 @@
 #define SYSTICK_SPEED_10us	(96000)    // every 1000th clock
 #define SYSTICK_SPEED_1us	(960000)   // every 100th clock
 #define SYSTICK_SPEED_100ns	(9600000)  // every 10th clock
-#define SYSTICK_SPEED_41ns  (24000000) // every 4nd clock
 #define SYSTICK_SPEED_10ns	(96000000) // every clock
-#define SYSTICK_TIMER_SPEED SYSTICK_SPEED_41ns
+#define SYSTICK_TIMER_SPEED SYSTICK_SPEED_1us
 
 void ll_system_init(void);
 
@@ -30,7 +29,6 @@ void ll_system_rand_init(void);
 
 void delay_ms(uint32_t ms);
 void delay_us(uint32_t us);
-void delay_ns(uint32_t ns);
 void delay(uint32_t ticks);
 
 #endif

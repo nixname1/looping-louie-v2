@@ -117,16 +117,7 @@ void delay_us(volatile uint32_t us)
   // wait until delay_timer was decreased to 0
   while(delay_timer);
 }
-/**
- * @brief stop the code execution for x nanoseconds
- * @param ns amount of microseconds to wait
- */
-void delay_ns(volatile uint32_t ns)
-{
-  delay_timer  = ((double)(SYSTICK_TIMER_SPEED / 1000000000)) * ns;
-  // wait until delay_timer was decreased to 0
-  while(delay_timer);
-}
+
 /**
  * @brief the systick handler
  */
