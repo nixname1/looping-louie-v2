@@ -30,6 +30,7 @@ void ll_system_rand_init(void);
 
 void delay_ms(uint32_t ms);
 void delay_us(uint32_t us);
+void delay_ns(uint32_t ns);
 void delay(uint32_t ticks);
 
 #endif
