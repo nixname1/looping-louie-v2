@@ -19,8 +19,7 @@ void ll_system_init()
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
   ll_system_rand_init();
-  // init the reset switch
-  //ll_reset_switch_init();
+  ll_reset_switch_init();
 
   // init the motor system
   ll_motor_init();
@@ -59,9 +58,8 @@ void ll_system_game_stop()
 }
 
 /**
- *
+ * @brief initialize rand()
  */
-
 void ll_system_rand_init()
 {
   uint32_t adc_val;
@@ -80,10 +78,13 @@ void ll_system_rand_init()
   {
 	ADC1->CR2 |= ADC_CR2_SWSTART; // start adc one time
 	while(!(ADC1->SR & ADC_SR_EOC)); // wait for adc
-
-	adc_val = ADC1->DR;
-	srand(adc_val);
   }
+
+  adc_val = ADC1->DR;
+  srand(adc_val);
+
+  // disable ADC again - not needed anymore
+  RCC->APB2ENR &= ~RCC_APB2ENR_ADC1EN; // clock adc1
 
 }
 
@@ -107,12 +108,22 @@ void delay_ms(volatile uint32_t ms)
   while(delay_timer);
 }
 /**
- * @brief stop the code execution for x microseconds
+ * @brief stop the code execution for minimum x microseconds (can be one more or less sometimes)
  * @param us amount of microseconds to wait
  */
 void delay_us(volatile uint32_t us)
 {
-  delay_timer  = (SYSTICK_TIMER_SPEED / 1000000) * us;
+  double scl;
+  if( us < 5)
+  {
+	us = 5;
+  }
+
+  scl = (double) SYSTICK_TIMER_SPEED / 1000000.0;
+  scl = (double) scl * us;
+  scl += 0.5;
+  delay_timer = (uint32_t) scl-4; // caused by the math with doubles
+
   // wait until delay_timer was decreased to 0
   while(delay_timer);
 }
