@@ -6,23 +6,27 @@
 #include "ll_motor.h"
 #include "ll_reset_switch.h"
 
-
 void SysTick_Handler(void);
 static volatile uint32_t delay_timer;
-
+static volatile uint64_t systick_counter; // stores up to 59973028 years
 /**
  * @brief initializes all modules needed for the game
  */
 void ll_system_init()
 {
+  NVIC_SetPriority(SysTick_IRQn, 6);
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/SYSTICK_TIMER_SPEED);
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
-  ll_system_rand_init();
-  ll_reset_switch_init();
+  // set the internal system counter to zero
+  systick_counter = 0;
+#ifdef DEBUG
+  ll_system_debug_init();
+#endif
 
-  // init the motor system
+  ll_system_rand_init();
   ll_motor_init();
+  //ll_reset_switch_init();
 }
 
 /**
@@ -88,6 +92,29 @@ void ll_system_rand_init()
 
 }
 
+/**
+ * initializes the onboard LED for debugging
+ */
+void ll_system_debug_init()
+{
+  RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+  GPIOA->MODER |= GPIO_MODER_MODER5_0;
+  GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR5; // highest speed
+}
+/**
+ * set debug LED on
+ */
+__inline void ll_system_debug_led_on()
+{
+  GPIOA->BSRR = GPIO_BSRR_BS_5;
+}
+/**
+ * set debug LED off
+ */
+__inline void ll_system_debug_led_off()
+{
+  GPIOA->BSRR = GPIO_BSRR_BR_5;
+}
 
 /**
  * @brief wait for X cycles of selected systick
@@ -103,40 +130,31 @@ void delay(volatile uint32_t ticks)
  */
 void delay_ms(volatile uint32_t ms)
 {
-  delay_timer  = (SYSTICK_TIMER_SPEED / 1000) * ms;
+  delay_timer  = (SYSTICK_TIMER_SPEED / 100) * ms;
+  delay_timer += 5;
+  delay_timer /= 10;
+
   // wait until delay_timer was decreased to 0
   while(delay_timer);
 }
-/**
- * @brief stop the code execution for minimum x microseconds (can be one more or less sometimes)
- * @param us amount of microseconds to wait
- */
-void delay_us(volatile uint32_t us)
+
+uint64_t ll_system_get_ticks()
 {
-  double scl;
-  if( us < 5)
-  {
-	us = 5;
-  }
-
-  scl = (double) SYSTICK_TIMER_SPEED / 1000000.0;
-  scl = (double) scl * us;
-  scl += 0.5;
-  delay_timer = (uint32_t) scl-4; // caused by the math with doubles
-
-  // wait until delay_timer was decreased to 0
-  while(delay_timer);
+  return systick_counter;
 }
-
 /**
  * @brief the systick handler
  */
 void __attribute__ ((section(".after_vectors")))
 SysTick_Handler(void)
 {
+  ll_system_debug_led_on();
+  // increment systic counter
+  systick_counter++;
   // only if timer is set - decrement the given value
   if(delay_timer)
   {
 	delay_timer--;
   }
+  ll_system_debug_led_off();
 }

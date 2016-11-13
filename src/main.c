@@ -8,22 +8,93 @@
 #include "ll_system.h"
 #include "ll_motor.h"
 
+enum ll_round_state handle_round(void);
+
+/**
+ * @brief handles the actual round step
+ * @retval returns the actual state of the round
+ */
+enum ll_round_state
+handle_round()
+{
+  static enum ll_round_step actual_round_step = LL_STEP_ROUND_WAIT_FOR_START;
+  enum ll_round_state retState = LL_STATE_ROUND_ERROR;
+
+  actual_round_step = LL_STEP_ROUND_RUN;
+  switch(actual_round_step)
+  {
+	/**
+	 * wait for a push to the RS
+	 * NEXT: LL_STEP_ROUND_START
+	 */
+  case LL_STEP_ROUND_WAIT_FOR_START:
+	// TODO: play some little animation (with WS2812B and RS)
+	// wait until RS was pressed
+	retState = LL_STATE_ROUND_WAITING;
+	break;
+
+	/**
+	 * if the RS were pushed and the last step was LL_STEP_ROUND_WAIT_FOR_START
+	 * NEXT: LL_STEP_ROUND_RUN
+	 */
+  case LL_STEP_ROUND_START:
+	// TODO: play animation for player that lost
+	retState = LL_STATE_ROUND_STARTING;
+	break;
+
+	/**
+	 * if a round is running
+	 * NEXT: LL_STEP_ROUND_END:
+	 */
+  case LL_STEP_ROUND_RUN:
+	// TODO: just some little animations (like single blinking LED's) and motor controlling
+	  while( 1 )
+		  ll_motor_run();
+	retState = LL_STATE_ROUND_RUNNING;
+	break;
+
+	/**
+	 * a player lost all chips -> round lost
+	 * NEXT: LL_STEP_ROUND_WAIT_FOR_START
+	 */
+  case LL_STEP_ROUND_END:
+	retState = LL_STATE_ROUND_STOPPING;
+	// TODO: play animations; player that lost gets an own one
+	break;
+
+  case LL_STEP_ROUND_ERROR:
+	// should not happen
+	retState = LL_STATE_ROUND_ERROR;
+	break;
+  }
+
+  return retState;
+}
+
+__inline void set_speed(uint32_t speed)
+{
+	TIM3->CCR1 = speed;
+}
 int
 main (int argc, char* argv[])
 {
   UNUSED(argc);
   UNUSED(argv);
 
-  enum LL_STEP actual_step = LL_STEP_RESET_AND_WAIT_FOR_START;
-  uint32_t tmp = 0;
+  enum ll_game_step actual_game_step = LL_STEP_RESET_AND_WAIT_FOR_START;
+  enum ll_round_state round_state = LL_STATE_ROUND_ERROR;
+
 
   trace_printf("SystemCoreClock: %lu\n", SystemCoreClock);
 
   ll_system_init();
 
+  // FIXME: only for debug - until we have a reset switch
+  actual_game_step = LL_STEP_GAME_RUN;
+
   while (1)
   {
-	switch(actual_step)
+	switch(actual_game_step)
 	{
 	  /**
 	   * context:
@@ -57,7 +128,11 @@ main (int argc, char* argv[])
 		 * NEXT: -
 		 */
 	  case LL_STEP_GAME_RUN:
-		// TODO: handle the rounds (see below)
+		round_state = handle_round();
+		if(round_state == LL_STATE_ROUND_ERROR)
+		  actual_game_step = LL_STEP_GAME_ERROR;
+		else
+		  actual_game_step = LL_STEP_GAME_STOP;
 		break;
 
 		/**
@@ -67,39 +142,7 @@ main (int argc, char* argv[])
 		 */
 	  case LL_STEP_GAME_STOP:
 		// TODO: stop the game, play an animation
-		break;
-
-		/**
-		 * wait for a push to the RS
-		 * NEXT: LL_STEP_ROUND_START
-		 */
-	  case LL_STEP_ROUND_WAIT_FOR_START:
-		// TODO: play some little animation (with WS2812B and RS)
-		break;
-
-		/**
-		 * if the RS were pushed and the last step was LL_STEP_ROUND_WAIT_FOR_START
-		 * NEXT: LL_STEP_ROUND_RUN
-		 */
-	  case LL_STEP_ROUND_START:
-		// TODO: play animation for player that lost
-		break;
-
-		/**
-		 * if a round is running
-		 * NEXT: LL_STEP_ROUND_END:
-		 */
-	  case LL_STEP_ROUND_RUN:
-		// TODO: just some little animations (like single blinking LED's) and motor controlling
-
-		break;
-
-		/**
-		 * a player lost all chips -> round lost
-		 * NEXT: LL_STEP_ROUND_WAIT_FOR_START
-		 */
-	  case LL_STEP_ROUND_END:
-		// TODO: play animations; player that lost gets an own one
+		actual_game_step = LL_STEP_RESET_AND_WAIT_FOR_START;
 		break;
 
 		/**
@@ -107,15 +150,10 @@ main (int argc, char* argv[])
 		 * some error occurred
 		 * NEXT: LL_STEP_RESET_AND_WAIT_FOR_START
 		 */
-	  case LL_STEP_ERROR:
+	  case LL_STEP_GAME_ERROR:
 		// should not happen - idk if needed
-		break;
-
-	  // this should never happen - otherwise something went terribly wrong!
-	  default:
+		actual_game_step = LL_STEP_GAME_STOP;
 		break;
 	}
-
   }
-
 }

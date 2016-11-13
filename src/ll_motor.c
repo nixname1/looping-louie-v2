@@ -1,8 +1,12 @@
+#include <stdlib.h>
+
 #include "stm32f4xx.h"
 #include "diag/Trace.h"
 
 #include "ll_system.h"
 #include "ll_motor.h"
+
+static uint32_t mg_next_speed_change = 0;
 
 /**
  * @brief initializes the motor module
@@ -51,18 +55,58 @@ int ll_motor_set_speed(uint32_t val, uint32_t dir)
  */
 int ll_motor_set_new_random_speed()
 {
-  uint32_t val = 50;
-  uint32_t direction = 1;
+  enum ll_motor_direction direction;
+  uint32_t val;
+  int rand_tmp;
 
-  if(direction)
+  // generate a direction
+  rand_tmp = rand();
+  if(rand_tmp <= ((RAND_MAX / 100) * 1)) // a change of 10% to get reverse
   {
+	  direction = LL_MOTOR_REVERSE;
+  }
 
+  rand_tmp = rand() % 100;
+  // generate a speed
+  switch(direction)
+  {
+  case LL_MOTOR_REVERSE:
+	  // use motor brake (~50% backward for ~10 ms)
+	  TIM3->CCR1 = 1850;
+	  delay_ms(100);
+	  // send zero
+	  TIM3->CCR1 = 1410;
+	  delay_ms(100);
+	  // and then we are able to send the speed backward
+	  val = 1680 + (uint32_t)((double) rand_tmp * 3.8);
+
+	  trace_printf("setting speed: %u reverse\n", val);
+	  break;
+
+  case LL_MOTOR_FORWARD:
+
+	  break;
+
+  case LL_MOTOR_STOP:
+	  // in case of stop - set to zero
+	  val = 1410;
+	  break;
   }
 
   TIM3->CCR1 = val;
-  trace_printf("setting speed: %ul %s\n", val, direction ? "backward" : "forward");
 
   return 0;
+}
+
+/**
+ * @brief runs the motor
+ */
+void ll_motor_run()
+{
+  if(mg_next_speed_change <= ll_system_get_ticks() )
+  {
+	ll_motor_set_new_random_speed();
+  }
 }
 
 /**
