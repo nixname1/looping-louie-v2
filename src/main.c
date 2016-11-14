@@ -7,6 +7,7 @@
 
 #include "ll_motor.h"
 #include "ll_system.h"
+#include "ll_led.h"
 
 enum ll_round_state handle_round(void);
 
@@ -70,10 +71,6 @@ enum ll_round_state handle_round()
     return retState;
 }
 
-__inline void set_speed(uint32_t speed)
-{
-    TIM3->CCR1 = speed;
-}
 int main(int argc, char *argv[])
 {
     UNUSED(argc);
@@ -85,6 +82,13 @@ int main(int argc, char *argv[])
     trace_printf("SystemCoreClock: %lu\n", SystemCoreClock);
 
     ll_system_init();
+
+    struct color c = { 1, 2, 4 };
+    while(1)
+    {
+        ll_led_write_pixel(c);
+        delay_ms(1);
+    }
 
     // FIXME: only for debug - until we have a reset switch
     actual_game_step = LL_STEP_GAME_RUN;
