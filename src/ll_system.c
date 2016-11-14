@@ -150,7 +150,6 @@ __inline uint64_t ll_system_get_ticks()
  */
 void __attribute__((section(".after_vectors"))) SysTick_Handler(void)
 {
-    ll_system_debug_led_on();
     // increment systic counter
     systick_counter++;
     // only if timer is set - decrement the given value
@@ -158,5 +157,4 @@ void __attribute__((section(".after_vectors"))) SysTick_Handler(void)
     {
         delay_timer--;
     }
-    ll_system_debug_led_off();
 }
