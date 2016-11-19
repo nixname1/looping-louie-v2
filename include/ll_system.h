@@ -12,6 +12,8 @@
 #define SYSTICK_SPEED_1us	(1000000)  // every 96th clock - 1.0416us
 #define SYSTICK_TIMER_SPEED SYSTICK_SPEED_100us
 
+#define LL_SYSTEM_NUM_PLAYERS   8
+
 enum ll_game_step
 {
     LL_STEP_RESET_AND_WAIT_FOR_START,
