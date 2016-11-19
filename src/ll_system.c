@@ -5,6 +5,7 @@
 #include "ll_motor.h"
 #include "ll_reset_switch.h"
 #include "ll_system.h"
+#include "ll_led.h"
 
 void SysTick_Handler(void);
 static volatile uint32_t delay_timer;
