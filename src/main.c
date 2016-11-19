@@ -83,9 +83,6 @@ int main(int argc, char *argv[])
 
     ll_system_init();
 
-    // FIXME: only for debug - until we have a reset switch
-    actual_game_step = LL_STEP_GAME_RUN;
-
     while (1)
     {
         switch (actual_game_step)
