@@ -10,6 +10,4 @@ struct color
 
 void ll_led_init(void);
 void ll_led_set_pixel(struct color color, uint32_t led);
-__inline void ll_led_write_pixel(struct color color);
-
 #endif
