@@ -9,7 +9,7 @@
 
 void SysTick_Handler(void);
 static volatile uint32_t delay_timer;
-static volatile uint64_t systick_counter; // stores up to 59973028 years
+static volatile uint64_t systick_counter;
 /**
  * @brief initializes all modules needed for the game
  */
@@ -109,14 +109,18 @@ void ll_system_debug_init()
  */
 __inline void ll_system_debug_led_on()
 {
+#ifdef DEBUG
     GPIOA->BSRR = GPIO_BSRR_BS_5;
+#endif
 }
 /**
  * set debug LED off
  */
 __inline void ll_system_debug_led_off()
 {
+#ifdef DEBUG
     GPIOA->BSRR = GPIO_BSRR_BR_5;
+#endif
 }
 
 /**
