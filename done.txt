@@ -1,9 +1,0 @@
-- readded .settings folder for eclipse
-- removed debug LED from systick
-- code reformat
-- implemented motor system
-- implemented mainloop
-- set systick to 100µs
-- added LED system
-
-
