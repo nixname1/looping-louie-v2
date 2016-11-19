@@ -12,3 +12,17 @@ backward MOTOR -->>
 
 1650 - 2040 low to full speed 
 
+
+
+
+
+starting at forward:  
+
+full	820 - 1180
+lower	1190 - 1360
+stop	1410
+middle	1410
+stop	1410
+lower	1680 - 2040
+full	2050
+stop	2060
