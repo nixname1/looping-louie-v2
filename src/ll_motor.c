@@ -147,7 +147,6 @@ void ll_motor_run()
 
         mg_next_speed_change = ll_system_get_ticks()
                 + (uint64_t) (speed_time * 10);
-        trace_printf("time for new speed: %ld ms\n", speed_time * 10 );
     }
 }
 
