@@ -5,8 +5,6 @@
 #include "ll_reset_switch.h"
 #include "ll_system.h"
 
-void EXTI2_IRQHandler(void);
-
 /**
  * @brief initializes the reset switch system
  */
