@@ -24,31 +24,14 @@ void ll_reset_switch_init()
     TIM4->CCMR1 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1; // pwm mode 1
     TIM4->CCER = TIM_CCER_CC1E;                        // enable ccr
     // TIM4->CR1 |= TIM_CR1_CEN; // enable timer
-
-    /** initialize the GPIO interrupt */
-    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-    SYSCFG->EXTICR[0] = SYSCFG_EXTICR1_EXTI2_PB;
-    EXTI->RTSR |= EXTI_RTSR_TR2; // rising trigger
-    EXTI->IMR |= EXTI_IMR_MR2;   // interrupt mask
-}
-
-void EXTI2_IRQHandler()
-{
-    EXTI->PR |= EXTI_PR_PR2;
-    NVIC_DisableIRQ(EXTI2_IRQn);
-
-    // TODO: implement
-
-    NVIC_EnableIRQ(EXTI2_IRQn);
 }
 
 /**
  * @brief enables the reset switch
  * enable interrupt for switch and enable the LED fade
  */
-__inline void ll_reset_switch_enable()
+void ll_reset_switch_enable()
 {
-    NVIC_EnableIRQ(EXTI2_IRQn);
     // TODO: implement interrput
 }
 
@@ -56,9 +39,8 @@ __inline void ll_reset_switch_enable()
  * @brief disables the reset switch
  * disable interrupt and LED fade
  */
-__inline void ll_reset_switch_disable()
+void ll_reset_switch_disable()
 {
-    NVIC_DisableIRQ(EXTI2_IRQn);
     // TODO: implement
 }
 
