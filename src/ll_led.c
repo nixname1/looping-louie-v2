@@ -36,16 +36,6 @@ void ll_led_update_all_leds()
 }
 
 /**
- * @brief set all leds for a player
- * @param   pixels  the colors; for every led one
- * @param   player  the number of the player to set the leds
- */
-void ll_led_set_pixel_for_player(struct color *new_pixel, uint32_t player)
-{
-    memcpy(&pixel[player * LL_LED_NUM_PER_PLAYER], new_pixel, sizeof(struct color) * LL_LED_NUM_PER_PLAYER);
-}
-
-/**
  * @brief shifts all colors to the left side
  */
 void ll_led_shift_all_left(void)
@@ -74,6 +64,17 @@ void ll_led_shift_all_right(void)
     }
     pixel[i] = tmp;
 }
+
+/**
+ * @brief set all leds for a player
+ * @param   pixels  the colors; for every led one
+ * @param   player  the number of the player to set the leds for
+ */
+void ll_led_set_pixel_for_player(struct color *new_pixel, uint32_t player)
+{
+    memcpy(&pixel[player * LL_LED_NUM_PER_PLAYER], new_pixel, sizeof(struct color) * LL_LED_NUM_PER_PLAYER);
+}
+
 /**
  * @brief   set a single pixel to a specified color
  * @param   pix the     the color to set
