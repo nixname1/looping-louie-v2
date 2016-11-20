@@ -67,8 +67,9 @@ void ll_led_shift_all_right(void)
 
 /**
  * @brief set all leds for a player
- * @param   pixels  the colors; for every led one
- * @param   player  the number of the player to set the leds for
+ * @param   new_pixel   the colors; for every led one
+ * @param   player      the number of the player to set the leds for
+ * @warning new_pixel has to hold minimum LL_LED_NUM_PER_PLAYER colors!
  */
 void ll_led_set_pixel_for_player(struct color *new_pixel, uint32_t player)
 {
