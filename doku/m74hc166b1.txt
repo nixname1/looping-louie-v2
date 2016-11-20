@@ -1,0 +1,7 @@
+Trigger input to µC (PB2 got HIGH signal):
+
+Set PE (Parallel enable) to low (LOW Active) and clock one time (CK LOW -> HIGH -> LOW)
+Then Set PE High (not active)
+
+then clock x times and read the result from DATA IN
+
