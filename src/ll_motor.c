@@ -118,7 +118,7 @@ void ll_motor_run()
     int t_max = 5500; // maximum ms
     int rnd_max = t_max;
 
-    if (mg_next_speed_change <= ll_system_get_ticks())
+    if (mg_next_speed_change <= ll_system_get_systime())
     {
         ll_motor_set_new_random_speed();
 
@@ -145,8 +145,8 @@ void ll_motor_run()
             speed_time = (rand() % (t_max - t_min - 1000)) + t_min;
         }
 
-        mg_next_speed_change = ll_system_get_ticks()
-                + (uint64_t) (speed_time * 10);
+        mg_next_speed_change = ll_system_get_systime()
+                + (uint64_t) speed_time;
     }
 }
 

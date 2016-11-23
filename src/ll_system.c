@@ -6,6 +6,7 @@
 #include "ll_reset_switch.h"
 #include "ll_system.h"
 #include "ll_led.h"
+#include "ll_external.h"
 
 void SysTick_Handler(void);
 static volatile uint32_t delay_timer;
@@ -130,8 +131,7 @@ __inline void ll_system_debug_led_off()
  */
 void delay(volatile uint32_t ticks)
 {
-    while (ticks--)
-        ;
+    while (ticks--);
 }
 /**
  * @brief stop the code execution for x milliseconds
@@ -139,19 +139,30 @@ void delay(volatile uint32_t ticks)
  */
 void delay_ms(volatile uint32_t ms)
 {
-    delay_timer = (SYSTICK_TIMER_SPEED / 100) * ms;
-    delay_timer += 5;
-    delay_timer /= 10;
+    delay_timer = (SYSTICK_TIMER_SPEED / 1000) * ms;
 
     // wait until delay_timer was decreased to 0
-    while (delay_timer)
-        ;
+    while (delay_timer);
 }
 
+/**
+ * @brief returns the systick counter
+ * @retval systick counter
+ */
 __inline uint64_t ll_system_get_ticks()
 {
     return systick_counter;
 }
+
+/**
+ * @brief returns the uptime in ms
+ * @retval uptime in ms
+ */
+__inline uint64_t ll_system_get_systime(void)
+{
+    return ll_system_get_ticks() / 10;
+}
+
 /**
  * @brief the systick handler
  */

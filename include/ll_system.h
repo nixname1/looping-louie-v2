@@ -63,5 +63,6 @@ void delay_ms(uint32_t ms);
 void delay(uint32_t ticks);
 
 uint64_t ll_system_get_ticks(void);
+uint64_t ll_system_get_systime(void);
 
 #endif
