@@ -146,15 +146,6 @@ void delay_ms(volatile uint32_t ms)
 }
 
 /**
- * @brief returns the systick counter
- * @retval systick counter
- */
-__inline uint64_t ll_system_get_ticks()
-{
-    return systick_counter;
-}
-
-/**
  * @brief returns the uptime in ms
  * @retval uptime in ms
  */
