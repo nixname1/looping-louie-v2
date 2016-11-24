@@ -151,7 +151,7 @@ void delay_ms(volatile uint32_t ms)
  */
 __inline uint64_t ll_system_get_systime(void)
 {
-    return ll_system_get_ticks() / 10;
+    return systick_counter / 10;
 }
 
 /**
