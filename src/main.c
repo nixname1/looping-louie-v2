@@ -8,6 +8,7 @@
 #include "ll_motor.h"
 #include "ll_system.h"
 #include "ll_led.h"
+#include "ll_external.h"
 
 enum ll_round_state handle_round(void);
 
@@ -85,6 +86,12 @@ int main(int argc, char *argv[])
 
     while (1)
     {
+        /**
+         * run system relevant modules
+         */
+        /** run module for external devices */
+        ll_ext_run();
+
         switch (actual_game_step)
         {
             /**

@@ -5,37 +5,37 @@
 #include "ll_external.h"
 #include "ll_system.h"
 
-void EXTI2_IRQHandler(void);
-inline static void clock_hc166(void);
-uint32_t read_hc166_data(void);
+inline static void clock_74hc166(void);
+inline static void reload_74hc166(void);
+uint32_t read_74hc166_data(void);
 
-uint32_t mg_exti_oc = 0; // exti2 occured
-uint64_t mg_exti_tm = 0; // time when exti2 occured
-uint32_t mg_exti_last_state = 0; // falling or rising state?
+// the last state of the external devices
+uint32_t mg_last_state = 0;
+// the time of the last readout
+uint64_t mg_last_readout_time = 0;
 
 /**
  * @brief inititalizes the External sources Module
+ * Pins:
+ * PIN  direction   usage
+ * PC1  output      PE (active low at 74hc166)
+ * PC4  output      clock
+ * PC5  input       data in from 74hc166
  */
 void ll_ext_init(void)
 {
     /**
-     * initialize control pins for HC166
+     * initialize control pins for 74HC166
      */
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
     GPIOC->MODER |= (GPIO_MODER_MODER1_0 | GPIO_MODER_MODER4_0);
     GPIOC->OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR1 & GPIO_OSPEEDER_OSPEEDR4);
 
+    GPIOC->MODER &= ~(GPIO_MODER_MODER5);
+    GPIOC->PUPDR |= GPIO_PUPDR_PUPDR5_1;
+
     //set PE to HIGH (it is LOW active)
     GPIOC->BSRR = GPIO_BSRR_BS_1;
-
-    /**
-    * initialize the EXTI2 Interrupt
-    */
-    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-    SYSCFG->EXTICR[0] = SYSCFG_EXTICR1_EXTI2_PB;
-    EXTI->RTSR |= EXTI_RTSR_TR2; // add rising trigger
-    EXTI->IMR |= EXTI_IMR_MR2; // interrupt mask
-    ll_ext_enable_intr();
 }
 
 /**
@@ -43,98 +43,72 @@ void ll_ext_init(void)
  */
 void ll_ext_run()
 {
-    uint32_t data;
-
-    // if a interrupt occured
-    if(mg_exti_oc)
+    if (ll_system_get_systime() > mg_last_readout_time + LL_EXT_POLL_TIME)
     {
-        mg_exti_oc = 0;
-        data = read_hc166_data();
-        if(data)
-        {
-
-        }
+        mg_last_state = read_74hc166_data();
+        trace_printf("0x%x\n", mg_last_state);
     }
+}
+
+/**
+ * @brief returns the status of a specific device
+ * @retval 0 if device was not triggered; 1 if it was
+ */
+uint32_t ll_ext_is_device_active(uint32_t device)
+{
+    return (mg_last_state & ((uint32_t) 1 << device)) >> device;
+}
+
+/**
+ * @brief   retunrns the time of the last device update
+ * @retval  timestamp of last update
+ */
+uint64_t ll_ext_get_last_readout_time(void)
+{
+    return mg_last_readout_time;
 }
 
 /**
  * @brief reads the data from HC166
  * @retval  the data read from HC166
  */
-uint32_t read_hc166_data(void)
+uint32_t read_74hc166_data(void)
 {
+    uint32_t i;
     uint32_t data = 0;
+    uint32_t bit;
 
+    reload_74hc166();
 
-
+    for (i = 0; i < LL_EXT_DEVICE_COUNT; i++)
+    {
+        bit = (GPIOC->IDR & GPIO_IDR_IDR_5);
+        bit >>= 5;
+        data |= bit << (i);
+        clock_74hc166();
+    }
+    mg_last_readout_time = ll_system_get_systime();
     return data;
+}
+
+/**
+ * @brief reloads the 74hc166 with actual values
+ */
+inline static void reload_74hc166()
+{
+    // enables PE (active LOW on 74hc166)
+    GPIOC->BSRR = GPIO_BSRR_BR_1;
+    // give a clock to 74hc166 so it loads the actual state
+    clock_74hc166();
+    // disable PE again
+    GPIOC->BSRR = GPIO_BSRR_BS_1;
 }
 
 /**
  * @brief give a clock to the HC166
  */
-inline static void clock_hc166()
+inline static void clock_74hc166()
 {
     GPIOC->BSRR = GPIO_BSRR_BS_4;
     GPIOC->BSRR = GPIO_BSRR_BR_4;
-}
-
-/**
- * @brief enables the external interrupt
- */
-inline void ll_ext_enable_intr(void)
-{
-    mg_exti_oc = 0; // reset intr flag
-    NVIC_EnableIRQ(EXTI2_IRQn);
-}
-
-/**
- * @brief enables the external interrupt
- */
-inline void ll_ext_disable_intr(void)
-{
-    NVIC_DisableIRQ(EXTI2_IRQn);
-}
-
-/**
- * @brief returns if a EXTI Interrupt occured
- * @retval 1 if a interrupt occured, 0 if not
- */
-uint64_t ll_ext_intr_occured(void)
-{
-    return mg_exti_oc;
-}
-
-/**
- * @brief returns the time of the last interrupt
- * @retval systime of last interrupt
- */
-uint64_t ll_ext_get_last_intr_time(void)
-{
-    return mg_exti_tm;
-}
-
-/**
- * @brief EXTI2 Handler
- */
-void EXTI2_IRQHandler()
-{
-    EXTI->PR |= EXTI_PR_PR2; // ISR Bit is getting cleared by writing '1'
-
-    if( ll_system_get_systime() <= mg_exti_tm + LL_EXT_DEBOUNCE_TIME )
-    {
-        return;
-    }
-    mg_exti_last_state = !!(GPIOB->IDR & GPIO_IDR_IDR_2);
-    mg_exti_tm = ll_system_get_systime();
-    mg_exti_oc = 1;
-
-    // enable PE so the HC166 saves the actual state
-    GPIOC->BSRR = GPIO_BSRR_BR_1;
-
-    clock_hc166();
-
-    // disable PE again, so that the HC166 shifts
-    // its data to our DATA IN (PC5)
-    GPIOC->BSRR = GPIO_BSRR_BS_1;
 }
