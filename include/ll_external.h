@@ -30,6 +30,9 @@
 /** number of devices connected to all 74hc166 */
 #define LL_EXT_DEVICE_COUNT     (9)
 
+/** time in ms from when a event gets interpreted as long event */
+#define LL_EXT_LONG_EVENT_TIME  (3000)
+
 /** defines for all devices */
 #define LL_EXT_POS_LB_PLAYER7   (0)
 #define LL_EXT_POS_LB_PLAYER6   (1)
@@ -41,11 +44,25 @@
 #define LL_EXT_POS_LB_PLAYER0   (7)
 #define LL_EXT_POS_RESET_SWITCH (8)
 
+enum ll_ext_event
+{
+    /** gets fired as soon as a device sends its event */
+    LL_EXT_EVENT_START,
+    /** gets fired as soon as the device event is longer than LL_EXT_LONG_EVENT_TIME */
+    LL_EXT_EVENT_LONG_EVENT,
+    /** gets fired if a device event is over (the device is not sending anymore */
+    LL_EXT_EVENT_END,
+    /** defines a whole finished event: start and end events were found */
+    LL_EXT_EVENT_DEVICE_EVENT,
+};
+
+typedef void(*ll_ext_device_callback)(uint64_t press_length, uint32_t event);
+
 void ll_ext_init(void);
 void ll_ext_run(void);
 
+void ll_ext_add_device_callback(ll_ext_device_callback callback);
 uint32_t ll_ext_is_device_active(uint32_t device);
-
 uint64_t ll_ext_get_last_readout_time(void);
 
 #endif

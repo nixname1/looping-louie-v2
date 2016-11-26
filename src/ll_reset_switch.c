@@ -5,6 +5,8 @@
 #include "ll_reset_switch.h"
 #include "ll_system.h"
 
+uint32_t mg_rs_is_enabled = 0;
+
 /**
  * @brief initializes the reset switch system
  */
@@ -21,7 +23,6 @@ void ll_reset_switch_init()
     TIM4->ARR = 200 - 1;                               // 200us per signal
     TIM4->CCMR1 = TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1; // pwm mode 1
     TIM4->CCER = TIM_CCER_CC1E;                        // enable ccr
-    // TIM4->CR1 |= TIM_CR1_CEN; // enable timer
 }
 
 /**
@@ -30,7 +31,8 @@ void ll_reset_switch_init()
  */
 void ll_reset_switch_enable()
 {
-    // TODO: implement interrput
+    TIM4->CR1 |= TIM_CR1_CEN;
+    mg_rs_is_enabled = 1;
 }
 
 /**
@@ -39,7 +41,8 @@ void ll_reset_switch_enable()
  */
 void ll_reset_switch_disable()
 {
-    // TODO: implement
+    TIM4->CR1 &= ~TIM_CR1_CEN;
+    mg_rs_is_enabled = 0;
 }
 
 /**
@@ -48,6 +51,11 @@ void ll_reset_switch_disable()
  */
 void ll_reset_switch_callback(int press_length)
 {
-    UNUSED(press_length);
-    // TODO: implement
+    // if reset switch is not enabled
+    if( !mg_rs_is_enabled )
+    {
+        return;
+    }
+
+
 }

@@ -46,8 +46,15 @@ void ll_ext_run()
     if (ll_system_get_systime() > mg_last_readout_time + LL_EXT_POLL_TIME)
     {
         mg_last_state = read_74hc166_data();
-        trace_printf("0x%x\n", mg_last_state);
     }
+}
+
+/**
+ * @brief adds a callback for a device that is conntected to the 74hc166
+ */
+void ll_ext_set_callback()
+{
+
 }
 
 /**
