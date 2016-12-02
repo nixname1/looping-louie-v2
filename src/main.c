@@ -9,6 +9,7 @@
 #include "ll_system.h"
 #include "ll_led.h"
 #include "ll_external.h"
+#include "ll_reset_switch.h"
 
 enum ll_round_state handle_round(void);
 
@@ -115,6 +116,10 @@ int main(int argc, char *argv[])
             case LL_STEP_RESET_AND_WAIT_FOR_START:
                 // TODO: fade LED of reset switch(RS) and play some nice animations with
                 // the WS2812B
+                if(!ll_reset_switch_is_enabled())
+                {
+                    ll_reset_switch_enable();
+                }
                 break;
 
                 /**

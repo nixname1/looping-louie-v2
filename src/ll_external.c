@@ -9,9 +9,11 @@ inline static void clock_74hc166(void);
 inline static void reload_74hc166(void);
 uint32_t read_74hc166_data(void);
 
-// the last state of the external devices
+/** the last state of the external devices */
 uint32_t mg_last_state = 0;
-// the time of the last readout
+/** the callbacks for the devices */
+ll_ext_device_event_callback mg_callbacks[LL_EXT_DEVICE_COUNT];
+/** the time of the last readout */
 uint64_t mg_last_readout_time = 0;
 
 /**
@@ -36,6 +38,8 @@ void ll_ext_init(void)
 
     //set PE to HIGH (it is LOW active)
     GPIOC->BSRR = GPIO_BSRR_BS_1;
+
+    memset(mg_callbacks, 0, sizeof(mg_callbacks)/sizeof(*mg_callbacks));
 }
 
 /**
@@ -43,18 +47,31 @@ void ll_ext_init(void)
  */
 void ll_ext_run()
 {
+    uint32_t new_state;
+    uint32_t i;
+
     if (ll_system_get_systime() > mg_last_readout_time + LL_EXT_POLL_TIME)
     {
-        mg_last_state = read_74hc166_data();
+        new_state = read_74hc166_data();
+        for(i = 0; i < LL_EXT_DEVICE_COUNT; i++)
+        {
+            if(ll_ext_is_device_active(i))
+            {
+
+            }
+        }
+        mg_last_state = new_state;
     }
 }
 
 /**
  * @brief adds a callback for a device that is conntected to the 74hc166
+ * @param device    the device, the callback is for
+ * @param callback  the callback to call on a event
  */
-void ll_ext_set_callback()
+void ll_ext_set_event_callback(enum ll_ext_device device, ll_ext_device_event_callback callback)
 {
-
+    mg_callbacks[device] = callback;
 }
 
 /**
@@ -67,7 +84,7 @@ uint32_t ll_ext_is_device_active(uint32_t device)
 }
 
 /**
- * @brief   retunrns the time of the last device update
+ * @brief   returns the time of the last device update
  * @retval  timestamp of last update
  */
 uint64_t ll_ext_get_last_readout_time(void)
@@ -87,6 +104,8 @@ uint32_t read_74hc166_data(void)
 
     reload_74hc166();
 
+    mg_last_readout_time = ll_system_get_systime();
+
     for (i = 0; i < LL_EXT_DEVICE_COUNT; i++)
     {
         bit = (GPIOC->IDR & GPIO_IDR_IDR_5);
@@ -94,7 +113,6 @@ uint32_t read_74hc166_data(void)
         data |= bit << (i);
         clock_74hc166();
     }
-    mg_last_readout_time = ll_system_get_systime();
     return data;
 }
 

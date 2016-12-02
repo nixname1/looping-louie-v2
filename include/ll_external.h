@@ -34,34 +34,34 @@
 #define LL_EXT_LONG_EVENT_TIME  (3000)
 
 /** defines for all devices */
-#define LL_EXT_POS_LB_PLAYER7   (0)
-#define LL_EXT_POS_LB_PLAYER6   (1)
-#define LL_EXT_POS_LB_PLAYER5   (2)
-#define LL_EXT_POS_LB_PLAYER4   (3)
-#define LL_EXT_POS_LB_PLAYER3   (4)
-#define LL_EXT_POS_LB_PLAYER2   (5)
-#define LL_EXT_POS_LB_PLAYER1   (6)
-#define LL_EXT_POS_LB_PLAYER0   (7)
-#define LL_EXT_POS_RESET_SWITCH (8)
+enum ll_ext_device
+{
+    LL_EXT_DEVICE_LB_PLAYER7   = 0,
+    LL_EXT_DEVICE_LB_PLAYER6   = 1,
+    LL_EXT_DEVICE_LB_PLAYER5   = 2,
+    LL_EXT_DEVICE_LB_PLAYER4   = 3,
+    LL_EXT_DEVICE_LB_PLAYER3   = 4,
+    LL_EXT_DEVICE_LB_PLAYER2   = 5,
+    LL_EXT_DEVICE_LB_PLAYER1   = 6,
+    LL_EXT_DEVICE_LB_PLAYER0   = 7,
+    LL_EXT_DEVICE_RESET_SWITCH = 7
+};
 
 enum ll_ext_event
 {
-    /** gets fired as soon as a device sends its event */
+    /** gets fired as soon as a device sends its event (reading 1 from device) */
     LL_EXT_EVENT_START,
-    /** gets fired as soon as the device event is longer than LL_EXT_LONG_EVENT_TIME */
-    LL_EXT_EVENT_LONG_EVENT,
-    /** gets fired if a device event is over (the device is not sending anymore */
+    /** gets fired if a device event is over (reading 0 from device) */
     LL_EXT_EVENT_END,
-    /** defines a whole finished event: start and end events were found */
-    LL_EXT_EVENT_DEVICE_EVENT,
 };
 
-typedef void(*ll_ext_device_callback)(uint64_t press_length, uint32_t event);
+/** function type of callback */
+typedef void (*ll_ext_device_event_callback)(enum ll_ext_event);
 
 void ll_ext_init(void);
 void ll_ext_run(void);
 
-void ll_ext_add_device_callback(ll_ext_device_callback callback);
+void ll_ext_set_event_callback(enum ll_ext_device device, ll_ext_device_event_callback callback);
 uint32_t ll_ext_is_device_active(uint32_t device);
 uint64_t ll_ext_get_last_readout_time(void);
 

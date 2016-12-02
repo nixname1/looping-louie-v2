@@ -6,6 +6,10 @@
 void ll_reset_switch_init(void);
 void ll_reset_switch_enable(void);
 void ll_reset_switch_disable(void);
-void ll_reset_switch_callback(int press_length);
+uint32_t ll_reset_switch_is_enabled(void);
+
+uint32_t ll_reset_switch_is_pushed(void);
+
+void ll_reset_switch_callback(enum ll_ext_event event);
 
 #endif
