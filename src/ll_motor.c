@@ -20,9 +20,7 @@ void ll_motor_init()
     GPIOC->OSPEEDR &= ~GPIO_OSPEEDER_OSPEEDR6;
     GPIOC->AFR[0] |= (GPIO_AF2_TIM3 << (6 * 4));
 
-    /**
-     * initialize the timer
-     */
+    /** initialize the timer */
     RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
     TIM3->PSC = 96 - 1;	// 1000 clocks per ms
     TIM3->ARR = 20000 - 1; // 20ms per signal
