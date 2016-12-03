@@ -120,6 +120,8 @@ int main(int argc, char *argv[])
                 {
                     ll_reset_switch_enable();
                 }
+                ll_reset_switch_fade_led();
+
                 break;
 
                 /**
