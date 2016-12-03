@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "stm32f4xx.h"
 
 #include "diag/Trace.h"
