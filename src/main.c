@@ -98,24 +98,23 @@ int main(int argc, char *argv[])
             /**
              * context:
              * "round" 	means the "actual playing" time. Everytime a player lost, a new
-             * round starts.
+             *          round starts.
              *
-             * "game" 	a bunch of rounds. A round is started if the reset switch
-             * 			is pressed first time after power on or after 10 minutes
-             * (?)
-             * 			the last round was lost by a player
+             * "game" 	a bunch of rounds. A game is started if the reset switch
+             * 			is pressed first time after power on or after 10 minutes(?)
+             * 			the last round was lost by a player and the reset switch
+             * 			was not pressed
              *
              * "play animation" play animation(s) with the WS2812B LED's
              */
 
             /**
              * wait for the beginning of a game. State after power on and after X
-             * minutes not played
+             * minutes no new round started
              * NEXT: LL_STEP_GAME_START
              */
             case LL_STEP_RESET_AND_WAIT_FOR_START:
-                // TODO: fade LED of reset switch(RS) and play some nice animations with
-                // the WS2812B
+                // TODO: play some nice animations with the WS2812B
                 if(!ll_reset_switch_is_enabled())
                 {
                     ll_reset_switch_enable();
