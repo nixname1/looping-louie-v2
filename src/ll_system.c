@@ -27,10 +27,10 @@ void ll_system_init()
 #endif
 
     ll_system_rand_init();
-    ll_led_init();
     ll_motor_init();
     ll_ext_init();
     ll_reset_switch_init();
+    ll_led_init();
 }
 
 /**

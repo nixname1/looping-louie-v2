@@ -20,6 +20,8 @@ void ll_led_init()
     GPIOC->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR0; // highest speed
 
     memset(pixel, 0, sizeof(struct color) * (sizeof(pixel) / sizeof(*pixel)) );
+
+    ll_led_update_all_leds();
 }
 
 /**
