@@ -9,6 +9,11 @@
 uint32_t mg_rs_is_enabled = 0;
 uint64_t mg_event_start_time = 0;
 uint64_t mg_event_end_time = 0;
+uint32_t mg_rs_was_pressed = 0;
+
+ll_reset_switch_long_event_cb mg_long_event_cb = NULL;
+
+void ll_reset_switch_callback(enum ll_ext_event event);
 
 /**
  * @brief initializes the reset switch system
@@ -100,12 +105,24 @@ uint32_t ll_reset_switch_is_enabled()
 }
 
 /**
- * @brief returns if the reset switch is pushed actually or not
- * @return 1 if the reset switch is pushed actually; 0 if not
+ * @brief returns if the reset switch was pressed or not;
+ *        then reset the state to 0
+ * @return 1 if the reset switch was pressed; 0 if not
  */
-uint32_t ll_reset_switch_is_pushed()
+uint32_t ll_reset_switch_was_pressed()
 {
-    return ll_ext_is_device_active(LL_EXT_DEVICE_RESET_SWITCH);
+    uint32_t state = (mg_event_end_time ? 1 : 0);
+    mg_event_end_time = 0;
+    return state;
+}
+
+/**
+ * @brief set the callback for a long event
+ * @param cb the callback
+ */
+void ll_reset_switch_set_long_event_callback(ll_reset_switch_long_event_cb cb)
+{
+    mg_long_event_cb = cb;
 }
 
 /**
@@ -114,6 +131,7 @@ uint32_t ll_reset_switch_is_pushed()
  */
 void ll_reset_switch_callback(enum ll_ext_event event)
 {
+    uint64_t event_time_difference;
     if( !mg_rs_is_enabled )
     {
         return;
@@ -128,6 +146,14 @@ void ll_reset_switch_callback(enum ll_ext_event event)
 
         case LL_EXT_EVENT_END:
             mg_event_end_time = ll_system_get_systime();
+            event_time_difference = mg_event_end_time - mg_event_start_time;
+            if( event_time_difference >= LL_RESET_SWITCH_LONG_EVENT_TIME )
+            {
+                if(mg_long_event_cb)
+                {
+                    mg_long_event_cb(event_time_difference);
+                }
+            }
             break;
     }
 }

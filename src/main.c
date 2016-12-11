@@ -119,7 +119,14 @@ int main(int argc, char *argv[])
                 {
                     ll_reset_switch_enable();
                 }
+                if(ll_reset_switch_was_pressed())
+                {
+                    actual_game_step = LL_STEP_GAME_START;
+                    break;
+                }
                 ll_reset_switch_fade_led();
+
+
 
                 break;
 
