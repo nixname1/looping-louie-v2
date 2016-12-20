@@ -103,7 +103,7 @@ static inline void ll_led_write_pixel(struct color color)
     __disable_irq();
     while (act_seq < 3)
     {
-        curbyte = seq[act_seq];
+        curbyte = (uint8_t) (seq[act_seq] * 0.8);
         act_bit_cnt = 0;
         while (act_bit_cnt < 8)
         {
