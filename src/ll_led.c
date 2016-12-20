@@ -3,6 +3,7 @@
 #include "stm32f4xx.h"
 
 #include "ll_system.h"
+#include "ll_player.h"
 #include "ll_led.h"
 
 static inline void ll_led_write_pixel(struct color color);

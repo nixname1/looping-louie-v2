@@ -1,7 +1,7 @@
 #ifndef LL_LED_H_
 #define LL_LED_H_
 
-#include "ll_system.h"
+#include "ll_player.h"
 
 #ifdef DEBUG
 #define LL_LED_NUM_PER_PLAYER   20 // just for debugging purposes
