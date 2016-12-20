@@ -35,6 +35,7 @@ void ll_led_update_all_leds()
         ll_led_write_pixel(pixel[i]);
         i++;
     }
+    delay_ms(1);
 }
 
 /**
