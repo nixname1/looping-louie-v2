@@ -21,6 +21,7 @@ enum ll_round_state handle_round()
 {
     static enum ll_round_step actual_round_step = LL_STEP_ROUND_WAIT_FOR_START;
     enum ll_round_state retState = LL_STATE_ROUND_ERROR;
+
     switch (actual_round_step)
     {
         /**
@@ -92,6 +93,7 @@ int main(int argc, char *argv[])
          */
         /** run module for external devices */
         ll_ext_run();
+        ll_reset_switch_run();
 
         switch (actual_game_step)
         {
@@ -115,19 +117,16 @@ int main(int argc, char *argv[])
              */
             case LL_STEP_RESET_AND_WAIT_FOR_START:
                 // TODO: play some nice animations with the WS2812B
-                if(!ll_reset_switch_is_enabled())
+                if(!ll_reset_switch_is_fading_enabled())
                 {
-                    ll_reset_switch_enable();
+                    ll_reset_switch_fading_enable();
                 }
                 if(ll_reset_switch_was_pressed())
                 {
+                    ll_reset_switch_fading_disable();
                     actual_game_step = LL_STEP_GAME_START;
                     break;
                 }
-                ll_reset_switch_fade_led();
-
-
-
                 break;
 
                 /**
@@ -136,6 +135,7 @@ int main(int argc, char *argv[])
                  */
             case LL_STEP_GAME_START:
                 // TODO: only light fading the RS-LED and play animation to start the game
+                actual_game_step = LL_STEP_GAME_RUN;
                 break;
 
                 /**
