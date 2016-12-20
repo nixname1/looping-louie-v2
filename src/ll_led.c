@@ -11,7 +11,6 @@ static struct color pixel[LL_LED_NUM_LEDS];
 
 /**
  * @brief   initializes the LED system
- * @param   leds_per_player   number of leds for every player
  */
 void ll_led_init()
 {
@@ -87,6 +86,14 @@ void ll_led_set_pixel_for_player(struct color *new_pixel, uint32_t player)
 void ll_led_set_pixel(struct color color, uint32_t led)
 {
     memcpy(&pixel[led], &color, sizeof(struct color));
+}
+
+/**
+ * @brief sets all pixel to 0
+ */
+void ll_led_clear_all_pixel()
+{
+    memset(pixel, 0, sizeof(pixel)/sizeof(*pixel));
 }
 /**
  * @brief   write a single color (24bit) to the LED data output
