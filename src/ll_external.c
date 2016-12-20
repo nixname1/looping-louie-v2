@@ -57,9 +57,22 @@ void ll_ext_run()
         new_state = read_74hc166_data();
         for(i = 0; i < LL_EXT_DEVICE_COUNT; i++)
         {
+            if(mg_callbacks[i] == NULL)
+                continue;
+
             if(ll_ext_is_device_active(i))
             {
-
+                if(!(new_state & ((uint32_t) 1 << i)))
+                {
+                    mg_callbacks[i](LL_EXT_EVENT_END);
+                }
+            }
+            else
+            {
+                if((new_state & ((uint32_t) 1 << i)))
+                {
+                    mg_callbacks[i](LL_EXT_EVENT_START);
+                }
             }
         }
         mg_last_state = new_state;
