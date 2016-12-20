@@ -6,14 +6,16 @@
 #include "ll_external.h"
 #include "ll_reset_switch.h"
 
-uint32_t mg_rs_is_enabled = 0;
+uint32_t mg_is_fading_enabled = 0;
 uint64_t mg_event_start_time = 0;
 uint64_t mg_event_end_time = 0;
-uint32_t mg_rs_was_pressed = 0;
+uint32_t mg_was_pressed = 0;
 
+ll_reset_switch_push_event_cb mg_push_event_cb = NULL;
 ll_reset_switch_long_event_cb mg_long_event_cb = NULL;
 
 void ll_reset_switch_callback(enum ll_ext_event event);
+void ll_reset_switch_fade_led(void);
 
 /**
  * @brief initializes the reset switch system
@@ -34,6 +36,14 @@ void ll_reset_switch_init()
     TIM4->CCER = TIM_CCER_CC1E;                        // enable ccr
 
     ll_ext_set_event_callback(LL_EXT_DEVICE_RESET_SWITCH, ll_reset_switch_callback);
+}
+
+void ll_reset_switch_run()
+{
+    if(mg_is_fading_enabled)
+    {
+        ll_reset_switch_fade_led();
+    }
 }
 
 /**
@@ -79,29 +89,29 @@ void ll_reset_switch_fade_led()
  * @brief enables the reset switch
  * enable interrupt for switch and enable the LED fade
  */
-void ll_reset_switch_enable()
+void ll_reset_switch_fading_enable()
 {
     TIM4->CR1 |= TIM_CR1_CEN;
-    mg_rs_is_enabled = 1;
+    mg_is_fading_enabled = 1;
 }
 
 /**
  * @brief disables the reset switch
  * disable interrupt and LED fade
  */
-void ll_reset_switch_disable()
+void ll_reset_switch_fading_disable()
 {
     TIM4->CR1 &= ~TIM_CR1_CEN;
-    mg_rs_is_enabled = 0;
+    mg_is_fading_enabled = 0;
 }
 
 /**
- * @brief returns if the reset switch is enabled or not
- * @return 1 if the RS is enabled; 0 if not
+ * @brief returns if fading of the LED of the reset switch is enabled
+ * @return 1 if it is enabled; 0 if it is not
  */
-uint32_t ll_reset_switch_is_enabled()
+uint32_t ll_reset_switch_is_fading_enabled()
 {
-    return mg_rs_is_enabled;
+    return mg_is_fading_enabled;
 }
 
 /**
@@ -114,6 +124,15 @@ uint32_t ll_reset_switch_was_pressed()
     uint32_t state = (mg_event_end_time ? 1 : 0);
     mg_event_end_time = 0;
     return state;
+}
+
+/**
+ * @brief set the callback for a push event
+ * @param cb the callback
+ */
+void ll_reset_switch_set_push_event_callback(ll_reset_switch_push_event_cb cb)
+{
+    mg_push_event_cb = cb;
 }
 
 /**
@@ -132,11 +151,6 @@ void ll_reset_switch_set_long_event_callback(ll_reset_switch_long_event_cb cb)
 void ll_reset_switch_callback(enum ll_ext_event event)
 {
     uint64_t event_time_difference;
-    if( !mg_rs_is_enabled )
-    {
-        return;
-    }
-
     switch(event)
     {
         case LL_EXT_EVENT_START:
@@ -152,6 +166,13 @@ void ll_reset_switch_callback(enum ll_ext_event event)
                 if(mg_long_event_cb)
                 {
                     mg_long_event_cb(event_time_difference);
+                }
+            }
+            else
+            {
+                if(mg_push_event_cb)
+                {
+                    mg_push_event_cb();
                 }
             }
             break;
