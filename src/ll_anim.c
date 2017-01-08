@@ -1,22 +1,10 @@
+#include <stdlib.h>
+#include <memory.h>
 #include "stm32f4xx.h"
+
 #include "ll_anim.h"
-#include "ll_player.h"
 #include "ll_led.h"
-
-enum step
-{
-    LL_ANIM_STEP_START,
-    LL_ANIM_STEP_RUN,
-    LL_ANIM_STEP_FINISH,
-    LL_ANIM_STEP_DO_NOTHING,
-};
-
-enum animation_step
-{
-    LL_ANIM_STEP_START_START,
-    LL_ANIM_STEP_START_RUN,
-    LL_ANIM_STEP_EXIT,
-};
+#include "ll_system.h"
 
 enum animation_state
 {
@@ -25,94 +13,59 @@ enum animation_state
     LL_ANIM_STATE_FINISHED,
 };
 
-enum animation_type
-{
-    LL_ANIM_TYPE_BOOT,
-};
-
-struct animation
-{
-    int32_t player;
-    enum animation_state state;
-    enum animation_type type;
-    enum animation_step start_step;
-    enum animation_step run_step;
-    enum animation_step exit_step;
-    struct color pixel[LL_LED_NUM_PER_PLAYER];
-};
-
 uint32_t mg_stop_request = 0;
 enum animation_state mg_state = LL_ANIM_STATE_FINISHED;
-enum step mg_step = LL_ANIM_STEP_START;
+enum anim_step mg_step = LL_ANIM_STEP_START;
 struct animation mg_actual_animation;
-
-uint32_t finish_animation(struct animation animation)
-{
-    switch(animation.type)
-    {
-        case LL_ANIM_TYPE_BOOT:
-
-            break;
-    }
-}
-
-uint32_t run_animation(struct animation animation)
-{
-    switch(animation.type)
-    {
-        case LL_ANIM_TYPE_BOOT:
-
-            break;
-    }
-}
-
-uint32_t start_animation(struct animation animation)
-{
-    switch(animation.type)
-    {
-        case LL_ANIM_TYPE_BOOT:
-
-            break;
-    }
-}
+uint32_t mg_is_active = 0;
+uint64_t mg_last_run = 0;
 
 /**
  * @brief runs the actual animation
  */
-void ll_anim_run()
-{
+void ll_anim_run() {
+    static uint64_t last_update = 0;
     uint32_t ret;
-    switch(mg_step)
+
+    if (!mg_is_active)
+        return;
+
+    if(ll_system_get_systime() >= mg_last_run + mg_actual_animation.speed)
     {
+        mg_last_run = ll_system_get_systime();
+    }
+    else
+    {
+        return;
+    }
+
+    switch (mg_step) {
         case LL_ANIM_STEP_START:
-            if(mg_state == LL_ANIM_STATE_FINISHED)
-            {
+            if (mg_state == LL_ANIM_STATE_FINISHED) {
                 ll_led_clear_all_pixel();
             }
 
             mg_state = LL_ANIM_STATE_STARTING;
-            ret = start_animation(mg_actual_animation);
-            if(ret)
-            {
+            ret = mg_actual_animation.start_animation(mg_actual_animation.payload);
+            if (ret) {
                 mg_step = LL_ANIM_STEP_RUN;
             }
             break;
 
         case LL_ANIM_STEP_RUN:
             mg_state = LL_ANIM_STATE_RUNNING;
-            ret = run_animation(mg_actual_animation);
-            if(mg_stop_request && ret)
-            {
+            ret = mg_actual_animation.run_animation(mg_actual_animation.payload);
+            if (mg_stop_request && ret) {
                 mg_step = LL_ANIM_STEP_FINISH;
             }
             break;
 
         case LL_ANIM_STEP_FINISH:
-            ret = finish_animation(mg_actual_animation);
-            if(ret)
-            {
+            ret = mg_actual_animation.finish_animation(mg_actual_animation.payload);
+            if (ret) {
                 mg_state = LL_ANIM_STATE_FINISHED;
                 mg_step = LL_ANIM_STEP_DO_NOTHING;
+                mg_is_active = 0;
             }
             break;
 
@@ -120,6 +73,20 @@ void ll_anim_run()
             // as said - do nothing
             break;
     }
+    if (ll_system_get_systime() >= last_update + ANIMATION_DELAY_MS)
+    {
+        ll_led_update_all_leds();
+        last_update = ll_system_get_systime();
+    }
+}
+
+/**
+ * @brief   returns if a animation is active
+ * @return  1 if is active, 0 if not
+ */
+uint32_t ll_anim_is_active()
+{
+    return mg_is_active;
 }
 
 /**
@@ -131,14 +98,12 @@ void ll_anim_stop_animation(void)
 }
 
 /**
- * @brief animate the boot animation
+ * @brief activates an animation
+ * @param animation the animation to activate
  */
-void ll_anim_animate_boot(void)
+void ll_anim_activate(struct animation *animation)
 {
-    struct animation boot;
-    boot.type = LL_ANIM_TYPE_BOOT;
-    boot.player = LL_PLAYER_0;
-
+    memcpy(&mg_actual_animation, animation, sizeof(*animation));
     mg_step = LL_ANIM_STEP_START;
-    mg_actual_animation = boot;
+    mg_is_active = 1;
 }
