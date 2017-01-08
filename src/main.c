@@ -7,10 +7,10 @@
 
 #include "ll_motor.h"
 #include "ll_system.h"
-#include "ll_led.h"
 #include "ll_external.h"
 #include "ll_reset_switch.h"
 #include "ll_anim.h"
+#include "ll_anim_game_start.h"
 
 enum ll_round_state handle_round(void);
 
@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
         /** run module for external devices */
         ll_ext_run();
         ll_reset_switch_run();
+        ll_anim_run();
 
         switch (actual_game_step)
         {
@@ -118,14 +119,15 @@ int main(int argc, char *argv[])
              */
             case LL_STEP_RESET_AND_WAIT_FOR_START:
                 // TODO: play some nice animations with the WS2812B
-                ll_anim_animate_boot();
                 if(!ll_reset_switch_is_fading_enabled())
                 {
-                    ll_reset_switch_fading_enable();
+                    ll_reset_switch_fading_enable(LL_RESET_SWITCH_FADE_TIME);
+                    ll_anim_animate_wait_for_game_start();
                 }
                 if(ll_reset_switch_was_pressed())
                 {
                     ll_reset_switch_fading_disable();
+                    ll_anim_stop_animation();
                     actual_game_step = LL_STEP_GAME_START;
                     break;
                 }
@@ -136,8 +138,10 @@ int main(int argc, char *argv[])
                  * NEXT: LL_STEP_GAME_RUN
                  */
             case LL_STEP_GAME_START:
-                // TODO: only light fading the RS-LED and play animation to start the game
-                actual_game_step = LL_STEP_GAME_RUN;
+                if(!ll_anim_is_active())
+                {
+                    actual_game_step = LL_STEP_GAME_RUN;
+                }
                 break;
 
                 /**
