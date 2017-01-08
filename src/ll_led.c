@@ -69,14 +69,33 @@ void ll_led_shift_all_right(void)
 }
 
 /**
+ * @brief shifts all colors of a circle for a specific player clockwise
+ * @param player player to shift circle
+ */
+void ll_led_shift_player_circle_right(uint32_t player)
+{
+    uint32_t i;
+    uint32_t player_offset = (player * LL_LED_NUM_PER_PLAYER);
+    uint32_t circle_offset = LL_LED_NUM_PER_BAR;
+    uint32_t offset = player_offset + circle_offset;
+    struct color tmp;
+    tmp = pixel[offset];
+    for(i = 0; i +1 < LL_LED_NUM_PER_CIRCLE; i++)
+    {
+        pixel[offset + i] = pixel[offset + i + 1];
+    }
+    pixel[offset + i] = tmp;
+}
+
+/**
  * @brief set all leds for a player
  * @param   new_pixel   the colors; for every led one
  * @param   player      the number of the player to set the leds for
  * @warning new_pixel has to hold minimum LL_LED_NUM_PER_PLAYER colors!
  */
-void ll_led_set_pixel_for_player(struct color *new_pixel, uint32_t player)
+void ll_led_set_pixel_for_player(struct color new_pixel, uint32_t pixel_number, uint32_t player)
 {
-    memcpy(&pixel[player * LL_LED_NUM_PER_PLAYER], new_pixel, sizeof(struct color) * LL_LED_NUM_PER_PLAYER);
+    memcpy(&pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number], &new_pixel, sizeof(*pixel));
 }
 
 /**
@@ -87,6 +106,19 @@ void ll_led_set_pixel_for_player(struct color *new_pixel, uint32_t player)
 void ll_led_set_pixel(struct color color, uint32_t led)
 {
     memcpy(&pixel[led], &color, sizeof(struct color));
+}
+
+/**
+ * @brief   sets the alpha value for a specific pixel
+ * @param pixel_number  number of the pixel to dimm
+ * @param player        player
+ */
+void ll_led_set_alpha_for_player_pixel(uint8_t alpha, uint32_t pixel_number, uint32_t player)
+{
+    struct color *c = &pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number];
+    double alpha_d = (double)alpha/(double)255;
+    struct color tmp = {c->r*alpha_d, c->g*alpha_d, c->b*alpha_d};
+    pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number] = tmp;
 }
 
 /**
@@ -103,7 +135,7 @@ void ll_led_clear_all_pixel()
  */
 static inline void ll_led_write_pixel(struct color color)
 {
-    uint8_t seq[3] = { color.g, color.r, color.b };
+    uint32_t seq[3] = { color.g, color.r, color.b };
     uint32_t act_seq = 0;
     uint8_t act_bit_cnt;
     uint8_t act_bit = 0;
