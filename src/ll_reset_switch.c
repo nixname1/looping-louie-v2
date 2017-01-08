@@ -10,6 +10,7 @@ uint32_t mg_is_fading_enabled = 0;
 uint64_t mg_event_start_time = 0;
 uint64_t mg_event_end_time = 0;
 uint32_t mg_was_pressed = 0;
+uint64_t mg_fade_speed = LL_RESET_SWITCH_FADE_TIME;
 
 ll_reset_switch_push_event_cb mg_push_event_cb = NULL;
 ll_reset_switch_long_event_cb mg_long_event_cb = NULL;
@@ -48,6 +49,7 @@ void ll_reset_switch_run()
 
 /**
  * @brief fades the LED of the reset switch
+ * @
  */
 void ll_reset_switch_fade_led()
 {
@@ -55,7 +57,7 @@ void ll_reset_switch_fade_led()
     static uint32_t dir = 0; // 0 = up; 1 = down
     uint32_t brightness;
 
-    if(ll_system_get_systime() < last_fade_time + LL_RESET_SWITCH_FADE_TIME)
+    if(ll_system_get_systime() < last_fade_time + mg_fade_speed)
     {
         return;
     }
@@ -89,10 +91,11 @@ void ll_reset_switch_fade_led()
  * @brief enables the reset switch
  * enable interrupt for switch and enable the LED fade
  */
-void ll_reset_switch_fading_enable()
+void ll_reset_switch_fading_enable(uint32_t fade_speed)
 {
     TIM4->CR1 |= TIM_CR1_CEN;
     mg_is_fading_enabled = 1;
+    mg_fade_speed = fade_speed;
 }
 
 /**

@@ -13,7 +13,7 @@ typedef void (*ll_reset_switch_long_event_cb)(uint64_t event_length);
 void ll_reset_switch_init(void);
 void ll_reset_switch_run(void);
 
-void ll_reset_switch_fading_enable(void);
+void ll_reset_switch_fading_enable(uint32_t fade_speed);
 void ll_reset_switch_fading_disable(void);
 uint32_t ll_reset_switch_is_fading_enabled(void);
 
