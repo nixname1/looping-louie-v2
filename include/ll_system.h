@@ -3,13 +3,10 @@
 
 #include "stm32f411xe.h"
 
-/**
- * one clock is 10,4166 ns
- */
-#define SYSTICK_SPEED_1ms 	(1000)     // every 96.000th clock - 1ms
-#define SYSTICK_SPEED_100us (10000)    // every 9.600th clock - 100ms
-#define SYSTICK_SPEED_10us	(100000)   // every 960th clock - 10.416us
-#define SYSTICK_SPEED_1us	(1000000)  // every 96th clock - 1.0416us
+#define SYSTICK_SPEED_1ms 	(1000)
+#define SYSTICK_SPEED_100us (10000)
+#define SYSTICK_SPEED_10us	(100000)
+#define SYSTICK_SPEED_1us	(1000000)
 #define SYSTICK_TIMER_SPEED SYSTICK_SPEED_100us
 
 enum ll_game_step
