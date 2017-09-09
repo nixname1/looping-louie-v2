@@ -34,6 +34,21 @@ void
 __attribute__((weak))
 __initialize_hardware_early(void)
 {
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    GPIOA->MODER |= GPIO_MODER_MODER5_0;
+    GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR5; // highest speed
+
+    // at start - blink long
+    GPIOA->BSRR = GPIO_BSRR_BS_5;
+    for (uint64_t i = 0; i < 100000000; i++);
+    GPIOA->BSRR = GPIO_BSRR_BR_5;
+    while (1)
+    {
+        for (uint32_t i = 0; i < 5000000; i++);
+        GPIOA->BSRR = GPIO_BSRR_BS_5;
+        for (uint32_t i = 0; i < 5000000; i++);
+        GPIOA->BSRR = GPIO_BSRR_BR_5;
+    }
   // Call the CSMSIS system initialisation routine.
   SystemInit();
 
