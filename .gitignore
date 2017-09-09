@@ -8,3 +8,4 @@ Release/
 *.elf
 *.swp
 cmake-build-*
+build/
