@@ -2,9 +2,8 @@
 #define LL_EXTERNAL_H_
 
 /**
- * There are 2 74hc166 ICs used. they are connected
- * in row to each other. The first one holds the light barriers,
- * the second one actually only the reset switch:
+ * There is a 74hc166 shift register.
+ * The lightbarriers of all 8 players are connected to it.
  *
  *                    µC
  *                    |
@@ -19,16 +18,15 @@
  *  74hc166_1_D7: Lightbarrier for player 0
  *                     |
  *                     V
- *  74hc166_2_D0: Reset switch
- *  74hc166_2_D1-D7: GND
+ *                    GND
  */
 
 
-/** get the status of external devices every 10 ms*/
+/** get the status of external devices every X ms*/
 #define LL_EXT_POLL_TIME    (10)
 
 /** number of devices connected to all 74hc166 */
-#define LL_EXT_DEVICE_COUNT     (9)
+#define LL_EXT_DEVICE_COUNT     (8)
 
 /** time in ms from when a event gets interpreted as long event */
 #define LL_EXT_LONG_EVENT_TIME  (3000)
@@ -43,8 +41,7 @@ enum ll_ext_device
     LL_EXT_DEVICE_LB_PLAYER3   = 4,
     LL_EXT_DEVICE_LB_PLAYER2   = 5,
     LL_EXT_DEVICE_LB_PLAYER1   = 6,
-    LL_EXT_DEVICE_LB_PLAYER0   = 7,
-    LL_EXT_DEVICE_RESET_SWITCH = 7
+    LL_EXT_DEVICE_LB_PLAYER0   = 7
 };
 
 enum ll_ext_event

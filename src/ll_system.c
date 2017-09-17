@@ -3,7 +3,6 @@
 #include "stm32f4xx.h"
 
 #include "ll_motor.h"
-#include "ll_reset_switch.h"
 #include "ll_system.h"
 #include "ll_led.h"
 #include "ll_external.h"
@@ -29,7 +28,6 @@ void ll_system_init()
     ll_system_rand_init();
     ll_motor_init();
     ll_ext_init();
-    ll_reset_switch_init();
     ll_led_init();
 }
 

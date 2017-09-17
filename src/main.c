@@ -8,7 +8,6 @@
 #include "ll_motor.h"
 #include "ll_system.h"
 #include "ll_external.h"
-#include "ll_reset_switch.h"
 #include "ll_anim.h"
 #include "ll_anim_game_start.h"
 
@@ -93,7 +92,6 @@ int main(int argc, char *argv[])
          * run system relevant modules
          */
         ll_ext_run();
-        ll_reset_switch_run();
         ll_anim_run();
 
         switch (actual_game_step)
@@ -118,14 +116,12 @@ int main(int argc, char *argv[])
              */
             case LL_STEP_RESET_AND_WAIT_FOR_START:
                 // TODO: play some nice animations with the WS2812B
-                if(!ll_reset_switch_is_fading_enabled())
+                //if(!ll_reset_switch_is_fading_enabled())
                 {
-                    ll_reset_switch_fading_enable(LL_RESET_SWITCH_FADE_TIME);
                     ll_anim_animate_wait_for_game_start();
                 }
-                if(ll_reset_switch_was_pressed())
+                //if(ll_reset_switch_was_pressed())
                 {
-                    ll_reset_switch_fading_disable();
                     ll_anim_stop_animation();
                     actual_game_step = LL_STEP_GAME_START;
                     break;
