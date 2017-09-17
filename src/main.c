@@ -92,7 +92,6 @@ int main(int argc, char *argv[])
         /**
          * run system relevant modules
          */
-        /** run module for external devices */
         ll_ext_run();
         ll_reset_switch_run();
         ll_anim_run();
