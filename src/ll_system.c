@@ -102,9 +102,11 @@ void ll_system_rand_init()
  */
 void ll_system_debug_init()
 {
+#ifdef DEBUG
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
     GPIOA->MODER |= GPIO_MODER_MODER5_0;
     GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR5; // highest speed
+#endif
 }
 /**
  * set debug LED on
