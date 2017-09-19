@@ -6,6 +6,8 @@
 #include "ll_system.h"
 #include "ll_led.h"
 #include "ll_external.h"
+#include "ll_anim.h"
+#include "ll_switch.h"
 
 void SysTick_Handler(void);
 static volatile uint32_t delay_timer;
@@ -29,38 +31,8 @@ void ll_system_init()
     ll_motor_init();
     ll_ext_init();
     ll_led_init();
-}
-
-/**
- * @brief start a new round in the running game
- */
-void ll_system_round_start()
-{
-    // TODO: implement
-}
-
-/**
- * @brief stop the round - but keep the game up
- */
-void ll_system_round_stop()
-{
-    // TODO: implement
-}
-
-/**
- * @brief start a new game
- */
-void ll_system_game_start()
-{
-    // TODO: implement
-}
-
-/**
- * @brief stop the actual game
- */
-void ll_system_game_stop()
-{
-    // TODO: implement
+    ll_anim_init();
+    ll_switch_init();
 }
 
 /**

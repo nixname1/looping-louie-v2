@@ -64,7 +64,9 @@ set(SOURCE_FILES
     src/ll_system.c
     src/ll_anim.c
     src/ll_player.c
-    src/ll_anim_game_start.c
+    src/ll_game.c
+    src/anim/system_boot.c
+    src/ll_switch.c
     src/main.c
     #src/stm32f4xx_hal_msp.c
     system/src/cmsis/system_stm32f4xx.c

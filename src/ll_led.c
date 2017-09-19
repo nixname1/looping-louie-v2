@@ -25,20 +25,6 @@ void ll_led_init()
 }
 
 /**
- * @brief updates the color of all leds
- */
-void ll_led_update_all_leds()
-{
-    uint32_t i = 0;
-    while(i < LL_LED_NUM_LEDS)
-    {
-        ll_led_write_pixel(pixel[i]);
-        i++;
-    }
-    delay_ms(1);
-}
-
-/**
  * @brief shifts all colors to the left side
  */
 void ll_led_shift_all_left(void)
@@ -74,6 +60,9 @@ void ll_led_shift_all_right(void)
  */
 void ll_led_shift_player_circle_right(uint32_t player)
 {
+    if(player >= LL_PLAYER_MAX_PLAYERS)
+        return;
+
     uint32_t i;
     uint32_t player_offset = (player * LL_LED_NUM_PER_PLAYER);
     uint32_t circle_offset = LL_LED_NUM_PER_BAR;
@@ -95,6 +84,10 @@ void ll_led_shift_player_circle_right(uint32_t player)
  */
 void ll_led_set_pixel_for_player(struct color new_pixel, uint32_t pixel_number, uint32_t player)
 {
+    if(player >= LL_PLAYER_MAX_PLAYERS || pixel_number >= LL_LED_NUM_PER_PLAYER)
+        return;
+
+    // TODO: use pointer for struct color instead of direct value
     memcpy(&pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number], &new_pixel, sizeof(*pixel));
 }
 
@@ -115,10 +108,35 @@ void ll_led_set_pixel(struct color color, uint32_t led)
  */
 void ll_led_set_alpha_for_player_pixel(uint8_t alpha, uint32_t pixel_number, uint32_t player)
 {
+    if(player >= LL_PLAYER_MAX_PLAYERS || pixel_number >= LL_LED_NUM_PER_PLAYER)
+        return;
+
     struct color *c = &pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number];
     double alpha_d = (double)alpha/(double)255;
     struct color tmp = {c->r*alpha_d, c->g*alpha_d, c->b*alpha_d};
     pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number] = tmp;
+}
+
+/**
+ * @brief clears a single pixel of a player
+ * @param pixel_number
+ * @param player
+ */
+void ll_led_clear_pixel_of_player(uint32_t pixel_number, uint32_t player)
+{
+    if(player >= LL_PLAYER_MAX_PLAYERS || pixel_number >= LL_LED_NUM_PER_PLAYER)
+        return;
+
+    memset(&pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number], 0, sizeof(*pixel));
+}
+
+/**
+ * @brief clears a single pixel
+ * @param pixel_number number of pixel to clear
+ */
+void ll_led_clear_pixel(uint32_t pixel_number)
+{
+    memset(&pixel[pixel_number], 0, sizeof(*pixel));
 }
 
 /**
@@ -128,6 +146,21 @@ void ll_led_clear_all_pixel()
 {
     memset(pixel, 0, sizeof(pixel)/sizeof(*pixel));
 }
+
+/**
+ * @brief updates the color of all leds
+ */
+void ll_led_update_all_leds()
+{
+    uint32_t i = 0;
+    while(i < LL_LED_NUM_LEDS)
+    {
+        ll_led_write_pixel(pixel[i]);
+        i++;
+    }
+    delay_ms(1);
+}
+
 /**
  * @brief   write a single color (24bit) to the LED data output
  * @brief   Format: GRB highest byte first

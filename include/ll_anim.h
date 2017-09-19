@@ -26,9 +26,25 @@ struct animation
     animation_callback finish_animation;
 };
 
+enum LL_ANIMATION
+{
+    LL_ANIM_SYSTEM_BOOT = 0,
+    LL_ANIM_SYSTEM_STANDBY = 1,
+    LL_ANIM_SYSTEM_ERROR = 2,
+    LL_ANIM_GAME_START = 3,
+    LL_ANIM_GAME_RUN = 4,
+    LL_ANIM_GAME_PAUSE = 5,
+    LL_ANIM_GAME_EXIT = 6,
+    LL_ANIM_PLAYER_LOST = 7,
+    LL_ANIM_PLAYER_LOST_ALONE = 8
+};
+
+void ll_anim_init(void);
 void ll_anim_run(void);
 
-void ll_anim_activate(struct animation *animation);
+int32_t ll_anim_add(animation_callback start_cb, animation_callback run_cb, animation_callback finish_cb, uint32_t speed,
+                 void *payload);
+void ll_anim_activate(enum LL_ANIMATION animation);
 uint32_t ll_anim_is_active(void);
 void ll_anim_stop_animation(void);
 

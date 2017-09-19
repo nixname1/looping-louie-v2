@@ -1,8 +1,7 @@
-#include "stm32f4xx.h"
-#include "ll_anim_game_start.h"
 #include "ll_anim.h"
-#include "ll_player.h"
 #include "ll_led.h"
+
+#include "anim/system_boot.h"
 
 struct payload
 {
@@ -13,30 +12,54 @@ struct payload
     uint8_t middle;
     uint8_t darkest;
     enum player player;
-};
-
-uint32_t finish_animation(void *payload);
-
-uint32_t run_animation(void *payload);
+} p;
 
 uint32_t start_animation(void *payload);
+uint32_t run_animation(void *payload);
+uint32_t finish_animation(void *payload);
 
 /**
- * @brief finish callback for this animation
+ * @brief start callback for animation
  * @param payload payload
  * @return 1 if finished, 0 if not yet
  */
-uint32_t finish_animation(void *payload)
+uint32_t start_animation(void *payload)
 {
     uint32_t i, j;
+    uint8_t alpha;
     struct payload *p = payload;
+
+    p->player = LL_PLAYER_ALL;
+    p->brightest = 0;
+    p->darkest = 0;
+    p->delay_bars = 0;
+    p->delay_circ = 0;
+    p->dir = 0;
+    p->middle = 0;
+
     for (i = 0; i < p->player; i++)
     {
-        for (j = 0; j < LL_LED_NUM_PER_PLAYER; j++)
+        struct color *c = ll_player_get_color_by_int(i);
+        for (j = 0; j < LL_LED_NUM_PER_CIRCLE / 2; j++)
         {
-            ll_led_set_alpha_for_player_pixel(255 / ((LL_LED_NUM_PER_PLAYER - (j + 1)) + 1), j, i);
+            alpha = ((double) 255 / (LL_LED_NUM_PER_CIRCLE / 2)) * (j + 1);
+            ll_led_set_pixel_for_player(*c, LL_LED_NUM_PER_BAR + j, i);
+            ll_led_set_alpha_for_player_pixel(alpha, LL_LED_NUM_PER_BAR + j, i);
+
+            ll_led_set_pixel_for_player(*c, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
+            ll_led_set_alpha_for_player_pixel(alpha, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
         }
+
+        ll_led_set_pixel_for_player(*c, 0, i);
+        ll_led_set_alpha_for_player_pixel(45, 0, i);
+        //ll_led_set_pixel_for_player(*c, 1, i);
+        //ll_led_set_alpha_for_player_pixel(127, 1, i);
+        ll_led_set_pixel_for_player(*c, 1, i);
     }
+    p->dir = 0;
+    p->brightest = 1;
+    p->middle = LL_LED_NUM_PER_BAR; // means "not shown"
+    p->darkest = 0;
 
     return 1;
 }
@@ -159,55 +182,32 @@ uint32_t run_animation(void *payload)
 }
 
 /**
- * @brief start callback for animation
+ * @brief finish callback for this animation
  * @param payload payload
  * @return 1 if finished, 0 if not yet
  */
-uint32_t start_animation(void *payload)
+uint32_t finish_animation(void *payload)
 {
     uint32_t i, j;
-    uint8_t alpha;
     struct payload *p = payload;
+
+    // run the animation
+    run_animation(payload);
+
+    // and add fading out
     for (i = 0; i < p->player; i++)
     {
-        struct color *c = ll_player_get_color_by_int(i);
-        for (j = 0; j < LL_LED_NUM_PER_CIRCLE / 2; j++)
+        for (j = 0; j < LL_LED_NUM_PER_PLAYER; j++)
         {
-            alpha = ((double) 255 / (LL_LED_NUM_PER_CIRCLE / 2)) * (j + 1);
-            ll_led_set_pixel_for_player(*c, LL_LED_NUM_PER_BAR + j, i);
-            ll_led_set_alpha_for_player_pixel(alpha, LL_LED_NUM_PER_BAR + j, i);
-
-            ll_led_set_pixel_for_player(*c, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
-            ll_led_set_alpha_for_player_pixel(alpha, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
+            ll_led_set_alpha_for_player_pixel(255 / ((LL_LED_NUM_PER_PLAYER - (j + 1)) + 1), j, i);
         }
-
-        ll_led_set_pixel_for_player(*c, 0, i);
-        ll_led_set_alpha_for_player_pixel(45, 0, i);
-        //ll_led_set_pixel_for_player(*c, 1, i);
-        //ll_led_set_alpha_for_player_pixel(127, 1, i);
-        ll_led_set_pixel_for_player(*c, 1, i);
     }
-    p->dir = 0;
-    p->brightest = 1;
-    p->middle = LL_LED_NUM_PER_BAR; // means "not shown"
-    p->darkest = 0;
 
     return 1;
 }
 
-/**
- * @brief animate the boot animation
- */
-void ll_anim_animate_wait_for_game_start(void)
+void anim_system_boot_init(void)
 {
-    struct animation boot;
-    static struct payload p;
     p.player = LL_PLAYER_ALL;
-    boot.speed = 18;
-    boot.payload = &p;
-    boot.start_animation = start_animation;
-    boot.run_animation = run_animation;
-    boot.finish_animation = finish_animation;
-
-    ll_anim_activate(&boot);
+    ll_anim_add(start_animation, run_animation, finish_animation, 60, &p);
 }

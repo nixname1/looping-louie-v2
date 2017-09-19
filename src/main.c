@@ -1,189 +1,123 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "stm32f4xx.h"
 
 #include "diag/Trace.h"
 
-#include "ll_motor.h"
 #include "ll_system.h"
 #include "ll_external.h"
 #include "ll_anim.h"
-#include "ll_anim_game_start.h"
+#include "ll_switch.h"
 
-enum ll_round_state handle_round(void);
-
-/**
- * @brief handles the actual round step
- * @retval returns the actual state of the round
- */
-enum ll_round_state handle_round()
+enum ll_system_step
 {
-    static enum ll_round_step actual_round_step = LL_STEP_ROUND_WAIT_FOR_START;
-    enum ll_round_state retState = LL_STATE_ROUND_ERROR;
+    LL_SYSTEM_STEP_BOOT,
+    LL_SYSTEM_STEP_GAME_START,
+    LL_SYSTEM_STEP_GAME_RUN,
+    LL_SYSTEM_STEP_GAME_PAUSE,
+    LL_SYSTEM_STEP_GAME_EXIT,
+    LL_SYSTEM_STEP_STANDBY,
+    LL_SYSTEM_STEP_SHUTDOWN,
+    LL_SYSTEM_STEP_ERROR
+};
 
-    switch (actual_round_step)
+enum boot_step
+{
+    LL_BOOT_STEP_INIT,
+    LL_BOOT_STEP_WAIT_FOR_SWITCH,
+    LL_BOOT_STEP_WAIT_FOR_ANIMATION
+};
+
+uint32_t run_system_boot()
+{
+    static enum boot_step step = LL_BOOT_STEP_INIT;
+    static uint64_t boot_time = 0;
+
+    switch(step)
     {
-        /**
-         * wait for a push to the RS
-         * NEXT: LL_STEP_ROUND_START
-         */
-        case LL_STEP_ROUND_WAIT_FOR_START:
-            // TODO: play some little animation (with WS2812B and RS)
-            // wait until RS was pressed
-            actual_round_step = LL_STEP_ROUND_START;
-            retState = LL_STATE_ROUND_WAITING;
+        case LL_BOOT_STEP_INIT:
+            ll_anim_activate(LL_ANIM_SYSTEM_BOOT);
+            boot_time = ll_system_get_systime();
+            step = LL_BOOT_STEP_WAIT_FOR_SWITCH;
             break;
 
-            /**
-             * if the RS were pushed and the last step was LL_STEP_ROUND_WAIT_FOR_START
-             * NEXT: LL_STEP_ROUND_RUN
-             */
-        case LL_STEP_ROUND_START:
-            // TODO: play animation for player that lost
-            actual_round_step = LL_STEP_ROUND_RUN;
-            retState = LL_STATE_ROUND_STARTING;
+        case LL_BOOT_STEP_WAIT_FOR_SWITCH:
+            if(ll_system_get_systime() >= boot_time + 3000 && !ll_switch_is_turned_on())
+            {
+                ll_anim_stop_animation();
+                step = LL_BOOT_STEP_WAIT_FOR_ANIMATION;
+            }
             break;
 
-            /**
-             * if a round is running
-             * NEXT: LL_STEP_ROUND_END:
-             */
-        case LL_STEP_ROUND_RUN:
-            // TODO: just some little animations (like single blinking LED's) and motor
-            // controlling
-            ll_motor_run();
-            retState = LL_STATE_ROUND_RUNNING;
-            break;
-
-            /**
-             * a player lost all chips -> round lost
-             * NEXT: LL_STEP_ROUND_WAIT_FOR_START
-             */
-        case LL_STEP_ROUND_END:
-            retState = LL_STATE_ROUND_STOPPING;
-            // TODO: play animations; player that lost gets an own one
-            break;
-
-        case LL_STEP_ROUND_ERROR:
-            // should not happen
-            retState = LL_STATE_ROUND_ERROR;
+        case LL_BOOT_STEP_WAIT_FOR_ANIMATION:
+            if(!ll_anim_is_active())
+            {
+                step = LL_BOOT_STEP_INIT;
+                return 1;
+            }
             break;
     }
-
-    return retState;
+    return 0;
 }
+
 
 int main(int argc, char *argv[])
 {
     UNUSED(argc);
     UNUSED(argv);
-
-    enum ll_game_step actual_game_step = LL_STEP_RESET_AND_WAIT_FOR_START;
-    enum ll_round_state round_state = LL_STATE_ROUND_ERROR;
+    enum ll_system_step actual_system_step;
+    uint64_t boot_time = 0;
 
     trace_printf("SystemCoreClock: %lu\n", SystemCoreClock);
 
     ll_system_init();
 
+    actual_system_step = LL_SYSTEM_STEP_BOOT;
     while (1)
     {
-        /**
-         * run system relevant modules
-         */
         ll_ext_run();
         ll_anim_run();
 
-        switch (actual_game_step)
+        switch (actual_system_step)
         {
-            /**
-             * context:
-             * "round" 	means the "actual playing" time. Everytime a player lost, a new
-             *          round starts.
-             *
-             * "game" 	a bunch of rounds. A game is started if the reset switch
-             * 			is pressed first time after power on or after 10 minutes(?)
-             * 			the last round was lost by a player and the reset switch
-             * 			was not pressed
-             *
-             * "play animation" play animation(s) with the WS2812B LED's
-             */
-
-            /**
-             * wait for the beginning of a game. State after power on and after X
-             * minutes no new round started
-             * NEXT: LL_STEP_GAME_START
-             */
-            case LL_STEP_RESET_AND_WAIT_FOR_START:
-                // TODO: play some nice animations with the WS2812B
-                //if(!ll_reset_switch_is_fading_enabled())
-                {
-                    ll_anim_animate_wait_for_game_start();
-                }
-                //if(ll_reset_switch_was_pressed())
-                {
-                    ll_anim_stop_animation();
-                    actual_game_step = LL_STEP_GAME_START;
-                    break;
-                }
+            case LL_SYSTEM_STEP_BOOT:
+                if(run_system_boot())
+                    actual_system_step = LL_SYSTEM_STEP_STANDBY;
                 break;
 
-                /**
-                 * the RS were pushed -> start a new game
-                 * NEXT: LL_STEP_GAME_RUN
-                 */
-            case LL_STEP_GAME_START:
-                if(!ll_anim_is_active())
-                {
-                    actual_game_step = LL_STEP_GAME_RUN;
-                }
+            case LL_SYSTEM_STEP_GAME_START:
+                // TODO: print game start animation
+                actual_system_step = LL_SYSTEM_STEP_GAME_RUN;
                 break;
 
-                /**
-                 * game is running -> handle round steps
-                 * NEXT: -
-                 */
-            case LL_STEP_GAME_RUN:
-                round_state = LL_STATE_ROUND_STARTING;
-                while ((round_state != LL_STATE_ROUND_ERROR)
-                       && (round_state != LL_STATE_ROUND_STOPPED))
-                {
-                    handle_round();
-                }
-                switch(round_state)
-                {
-                    case LL_STATE_ROUND_WAITING:
-                    case LL_STATE_ROUND_STARTING:
-                    case LL_STATE_ROUND_RUNNING:
-                    case LL_STATE_ROUND_STOPPING:
-                        break;
-                    case LL_STATE_ROUND_STOPPED:
-                        actual_game_step = LL_STEP_GAME_STOP;
-                        break;
-                    case LL_STATE_ROUND_ERROR:
-                        actual_game_step = LL_STEP_GAME_ERROR;
-                        break;
-                }
+            case LL_SYSTEM_STEP_GAME_RUN:
+                // TODO: run the game and its logic
+                // TODO: whence a player lost -> exit game
+                actual_system_step = LL_SYSTEM_STEP_GAME_EXIT;
                 break;
 
-                /**
-                 * if after X minutes no new round were started
-                 * or the RS were pushed for over 5 seconds
-                 * NEXT: LL_STEP_RESET_AND_WAIT_FOR_START
-                 */
-            case LL_STEP_GAME_STOP:
-                // TODO: stop the game, play an animation
-                actual_game_step = LL_STEP_RESET_AND_WAIT_FOR_START;
+            case LL_SYSTEM_STEP_GAME_PAUSE:
+                // whence game is running and the switch was turned off
+                // TODO: freeze game state and fade LED's
+                actual_system_step = LL_SYSTEM_STEP_GAME_RUN;
                 break;
 
-                /**
-                 * do not know if needed
-                 * some error occurred
-                 * NEXT: LL_STEP_RESET_AND_WAIT_FOR_START
-                 */
-            case LL_STEP_GAME_ERROR:
-                // should not happen - idk if needed
-                actual_game_step = LL_STEP_GAME_STOP;
+            case LL_SYSTEM_STEP_GAME_EXIT:
+                // after a game was lost or we got the switch combination
+                // on -> off -> on -> off within 1 second
+                // TODO: print some exit animation
+                actual_system_step = LL_SYSTEM_STEP_STANDBY;
+                break;
+
+            case LL_SYSTEM_STEP_STANDBY:
+                // TODO: print some standby animation
+                actual_system_step = LL_SYSTEM_STEP_BOOT;
+                break;
+
+            case LL_SYSTEM_STEP_ERROR:
+                break;
+
+            case LL_SYSTEM_STEP_SHUTDOWN:
                 break;
         }
     }
