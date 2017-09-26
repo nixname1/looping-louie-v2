@@ -82,13 +82,12 @@ void ll_led_shift_player_circle_right(uint32_t player)
  * @param   player      the number of the player to set the leds for
  * @warning new_pixel has to hold minimum LL_LED_NUM_PER_PLAYER colors!
  */
-void ll_led_set_pixel_for_player(struct color new_pixel, uint32_t pixel_number, uint32_t player)
+void ll_led_set_pixel_for_player(struct color *new_pixel, uint32_t pixel_number, uint32_t player)
 {
     if(player >= LL_PLAYER_MAX_PLAYERS || pixel_number >= LL_LED_NUM_PER_PLAYER)
         return;
 
-    // TODO: use pointer for struct color instead of direct value
-    memcpy(&pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number], &new_pixel, sizeof(*pixel));
+    memcpy(&pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number], new_pixel, sizeof(*pixel));
 }
 
 /**
@@ -96,9 +95,9 @@ void ll_led_set_pixel_for_player(struct color new_pixel, uint32_t pixel_number, 
  * @param   pix the     the color to set
  * @param   led_offset  led to set; start counting at 0
  */
-void ll_led_set_pixel(struct color color, uint32_t led)
+void ll_led_set_pixel(struct color *color, uint32_t led)
 {
-    memcpy(&pixel[led], &color, sizeof(struct color));
+    memcpy(&pixel[led], color, sizeof(*pixel));
 }
 
 /**

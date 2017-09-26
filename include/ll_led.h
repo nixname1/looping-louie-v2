@@ -26,8 +26,8 @@ struct color
 void ll_led_init(void);
 void ll_led_run(void);
 void ll_led_update_all_leds(void);
-void ll_led_set_pixel_for_player(struct color new_pixel, uint32_t pixel_number, uint32_t player);
-void ll_led_set_pixel(struct color color, uint32_t led);
+void ll_led_set_pixel_for_player(struct color *new_pixel, uint32_t pixel_number, uint32_t player);
+void ll_led_set_pixel(struct color *color, uint32_t led);
 void ll_led_set_alpha_for_player_pixel(uint8_t alpha, uint32_t pixel_number, uint32_t player);
 void ll_led_clear_all_pixel(void);
 void ll_led_shift_all_left(void);

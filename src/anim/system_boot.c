@@ -43,18 +43,18 @@ uint32_t start_animation(void *payload)
         for (j = 0; j < LL_LED_NUM_PER_CIRCLE / 2; j++)
         {
             alpha = ((double) 255 / (LL_LED_NUM_PER_CIRCLE / 2)) * (j + 1);
-            ll_led_set_pixel_for_player(*c, LL_LED_NUM_PER_BAR + j, i);
+            ll_led_set_pixel_for_player(c, LL_LED_NUM_PER_BAR + j, i);
             ll_led_set_alpha_for_player_pixel(alpha, LL_LED_NUM_PER_BAR + j, i);
 
-            ll_led_set_pixel_for_player(*c, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
+            ll_led_set_pixel_for_player(c, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
             ll_led_set_alpha_for_player_pixel(alpha, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
         }
 
-        ll_led_set_pixel_for_player(*c, 0, i);
+        ll_led_set_pixel_for_player(c, 0, i);
         ll_led_set_alpha_for_player_pixel(45, 0, i);
-        //ll_led_set_pixel_for_player(*c, 1, i);
+        //ll_led_set_pixel_for_player(c, 1, i);
         //ll_led_set_alpha_for_player_pixel(127, 1, i);
-        ll_led_set_pixel_for_player(*c, 1, i);
+        ll_led_set_pixel_for_player(c, 1, i);
     }
     p->dir = 0;
     p->brightest = 1;
@@ -147,18 +147,18 @@ uint32_t run_animation(void *payload)
             for (j = 0; j < LL_LED_NUM_PER_BAR; j++)
             {
                 if (j == p->brightest)
-                    ll_led_set_pixel_for_player(*color, j, i);
+                    ll_led_set_pixel_for_player(color, j, i);
                 else if (j == p->middle)
                 {
-                    ll_led_set_pixel_for_player(*color, j, i);
+                    ll_led_set_pixel_for_player(color, j, i);
                     ll_led_set_alpha_for_player_pixel(127, j, i);
                 } else if (j == p->darkest)
                 {
-                    ll_led_set_pixel_for_player(*color, j, i);
+                    ll_led_set_pixel_for_player(color, j, i);
                     ll_led_set_alpha_for_player_pixel(45, j, i);
                 } else
                 {
-                    ll_led_set_pixel_for_player(no_color, j, i);
+                    ll_led_set_pixel_for_player(&no_color, j, i);
                 }
             }
         }

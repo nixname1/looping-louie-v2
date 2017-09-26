@@ -136,5 +136,5 @@ int32_t ll_anim_add(animation_callback start_cb, animation_callback run_cb, anim
     mg_animations[mg_animation_cnt - 1].start_animation = start_cb;
     mg_animations[mg_animation_cnt - 1].run_animation = run_cb;
     mg_animations[mg_animation_cnt - 1].finish_animation = finish_cb;
-    return mg_animation_cnt;
+    return (int32_t) mg_animation_cnt;
 }
