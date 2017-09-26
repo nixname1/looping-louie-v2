@@ -11,10 +11,6 @@
 
 void ll_system_init(void);
 
-/** round handling */
-void ll_system_round_start(void);
-void ll_system_round_stop(void);
-
 /** game handling */
 void ll_system_game_start(void);
 void ll_system_game_stop(void);
