@@ -9,18 +9,19 @@
 
 #define LL_LED_NUM_LEDS (LL_LED_NUM_PER_PLAYER * LL_PLAYER_MAX_PLAYERS)
 
-#define RED     ((struct color) {255, 0, 0})
-#define GREEN   ((struct color) {0, 255, 0})
-#define BLUE    ((struct color) {0, 0, 255})
-#define YELLOW  ((struct color) {255, 100, 0})
-#define PURPLE  ((struct color) {255, 0, 127}) // 255 was to much
-#define WHITE   ((struct color) {255, 255, 255})
+#define RED     ((struct color) {255, 0, 0, 255})
+#define GREEN   ((struct color) {0, 255, 0, 255})
+#define BLUE    ((struct color) {0, 0, 255, 255})
+#define YELLOW  ((struct color) {255, 100, 0, 255})
+#define PURPLE  ((struct color) {255, 0, 127, 255})
+#define WHITE   ((struct color) {255, 255, 255, 255})
 
 struct color
 {
     uint8_t r; // red
     uint8_t g; // green
     uint8_t b; // blue
+	uint8_t a; // alpha
 };
 
 void ll_led_init(void);

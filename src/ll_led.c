@@ -110,10 +110,7 @@ void ll_led_set_alpha_for_player_pixel(uint8_t alpha, uint32_t pixel_number, uin
     if(player >= LL_PLAYER_MAX_PLAYERS || pixel_number >= LL_LED_NUM_PER_PLAYER)
         return;
 
-    struct color *c = &pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number];
-    double alpha_d = (double)alpha/(double)255;
-    struct color tmp = {c->r*alpha_d, c->g*alpha_d, c->b*alpha_d};
-    pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number] = tmp;
+    pixel[player * LL_LED_NUM_PER_PLAYER + pixel_number].a = alpha;
 }
 
 /**
@@ -175,7 +172,7 @@ static inline void ll_led_write_pixel(struct color color)
     __disable_irq();
     while (act_seq < 3)
     {
-        curbyte = (uint8_t) (seq[act_seq] * 0.8);
+        curbyte = (uint8_t) (seq[act_seq] * 0.8 * color.a);
         act_bit_cnt = 0;
         while (act_bit_cnt < 8)
         {
