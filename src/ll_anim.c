@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <memory.h>
-#include "stm32f4xx.h"
 
 #include "ll_anim.h"
 #include "ll_led.h"
@@ -34,7 +33,6 @@ void ll_anim_init()
  * @brief runs the actual animation
  */
 void ll_anim_run() {
-    static uint64_t last_update = 0;
     uint32_t ret;
 
     if (!mg_is_active)
@@ -84,11 +82,8 @@ void ll_anim_run() {
             // as said - do nothing
             break;
     }
-    if (ll_system_get_systime() >= last_update + ANIMATION_DELAY_MS)
-    {
-        ll_led_update_all_leds();
-        last_update = ll_system_get_systime();
-    }
+
+	ll_led_update_all_leds();
 }
 
 /**
