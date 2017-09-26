@@ -9,34 +9,6 @@
 #define SYSTICK_SPEED_1us	(1000000)
 #define SYSTICK_TIMER_SPEED SYSTICK_SPEED_100us
 
-enum ll_game_step
-{
-    LL_STEP_RESET_AND_WAIT_FOR_START,
-    LL_STEP_GAME_START,
-    LL_STEP_GAME_RUN,
-    LL_STEP_GAME_STOP,
-    LL_STEP_GAME_ERROR
-};
-
-enum ll_round_step
-{
-    LL_STEP_ROUND_WAIT_FOR_START,
-    LL_STEP_ROUND_START,
-    LL_STEP_ROUND_RUN,
-    LL_STEP_ROUND_END,
-    LL_STEP_ROUND_ERROR
-};
-
-enum ll_round_state
-{
-    LL_STATE_ROUND_ERROR = -1,
-    LL_STATE_ROUND_WAITING,
-    LL_STATE_ROUND_STARTING,
-    LL_STATE_ROUND_RUNNING,
-    LL_STATE_ROUND_STOPPING,
-    LL_STATE_ROUND_STOPPED
-};
-
 void ll_system_init(void);
 
 /** round handling */
