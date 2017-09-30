@@ -1,6 +1,7 @@
 #ifndef LL_LED_H_
 #define LL_LED_H_
 
+#include <stdint.h>
 #include "ll_player.h"
 
 #define LL_LED_NUM_PER_CIRCLE   (12)

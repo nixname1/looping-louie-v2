@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "ll_player.h"
 #include "ll_led.h"

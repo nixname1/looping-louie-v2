@@ -1,8 +1,6 @@
 #ifndef _LL_SYSTEM_H_
 #define _LL_SYSTEM_H_
 
-#include "stm32f411xe.h"
-
 #define SYSTICK_SPEED_1ms 	(1000)
 #define SYSTICK_SPEED_100us (10000)
 #define SYSTICK_SPEED_10us	(100000)

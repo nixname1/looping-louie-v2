@@ -1,6 +1,8 @@
 #ifndef _LL_MOTOR_H_
 #define _LL_MOTOR_H_
 
+#include <stdint.h>
+
 enum ll_motor_direction
 {
     LL_MOTOR_REVERSE,

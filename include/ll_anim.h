@@ -1,8 +1,7 @@
 #ifndef LL_ANIM_H_
 #define LL_ANIM_H_
 
-#include <unistd.h>
-#include "ll_player.h"
+#include <stdint.h>
 #include "ll_led.h"
 
 #define ANIMATION_FPS       (100)

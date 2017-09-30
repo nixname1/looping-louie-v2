@@ -1,7 +1,7 @@
 #ifndef LL_PLAYER_H_
 #define LL_PLAYER_H_
 
-#include <unistd.h>
+#include <stdint.h>
 
 enum player
 {
