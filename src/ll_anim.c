@@ -1,11 +1,8 @@
 #include <stdlib.h>
 #include <memory.h>
+#include <ll_led.h>
 
 #include "ll_anim.h"
-#include "ll_led.h"
-#include "ll_system.h"
-
-#include "anim/system_boot.h"
 
 enum animation_state
 {
@@ -24,23 +21,26 @@ uint64_t mg_last_run = 0;
 uint32_t mg_animation_cnt = 0;
 struct animation *mg_animations = NULL;
 
-void ll_anim_init()
+struct renderer *render;
+
+void ll_anim_init(struct renderer *renderer)
 {
-    anim_system_boot_init();
+	render = renderer;
 }
 
 /**
  * @brief runs the actual animation
  */
-void ll_anim_run() {
+void ll_anim_run(uint64_t system_time) {
+	struct animation *anim = &mg_animations[mg_actual_animation];
     uint32_t ret;
 
     if (!mg_is_active)
         return;
 
-    if(ll_system_get_systime() >= mg_last_run + mg_animations[mg_actual_animation].speed)
+    if(system_time >= mg_last_run + anim->speed)
     {
-        mg_last_run = ll_system_get_systime();
+        mg_last_run = system_time;
     }
     else
     {
@@ -49,12 +49,8 @@ void ll_anim_run() {
 
     switch (mg_step) {
         case LL_ANIM_STEP_START:
-            if (mg_state == LL_ANIM_STATE_FINISHED) {
-                ll_led_clear_all_pixel();
-            }
-
             mg_state = LL_ANIM_STATE_STARTING;
-            ret = mg_animations[mg_actual_animation].start_animation(mg_animations[mg_actual_animation].payload);
+            ret = anim->start_animation(anim->framebuffer, anim->payload);
             if (ret) {
                 mg_step = LL_ANIM_STEP_RUN;
             }
@@ -62,14 +58,14 @@ void ll_anim_run() {
 
         case LL_ANIM_STEP_RUN:
             mg_state = LL_ANIM_STATE_RUNNING;
-            ret = mg_animations[mg_actual_animation].run_animation(mg_animations[mg_actual_animation].payload);
+            ret = anim->run_animation(anim->framebuffer, anim->payload);
             if (mg_stop_request && ret) {
                 mg_step = LL_ANIM_STEP_FINISH;
             }
             break;
 
         case LL_ANIM_STEP_FINISH:
-            ret = mg_animations[mg_actual_animation].finish_animation(mg_animations[mg_actual_animation].payload);
+            ret = anim->finish_animation(anim->framebuffer, anim->payload);
             if (ret) {
                 mg_state = LL_ANIM_STATE_FINISHED;
                 mg_step = LL_ANIM_STEP_DO_NOTHING;
@@ -82,8 +78,6 @@ void ll_anim_run() {
             // as said - do nothing
             break;
     }
-
-	ll_led_update_all_leds();
 }
 
 /**
@@ -114,9 +108,13 @@ void ll_anim_activate(enum LL_ANIMATION animation)
     mg_is_active = 1;
 }
 
-int32_t ll_anim_add(animation_callback start_cb, animation_callback run_cb, animation_callback finish_cb,
-                 uint32_t speed_fps, void *payload)
+int32_t ll_anim_add(struct animation *anim)
 {
+    if(!anim)
+    {
+        return -1;
+    }
+
     mg_animation_cnt++;
     void *tmp;
     tmp = realloc(mg_animations, sizeof(*mg_animations) * mg_animation_cnt);
@@ -125,11 +123,7 @@ int32_t ll_anim_add(animation_callback start_cb, animation_callback run_cb, anim
         return -1;
     }
 
-    mg_animations = tmp;
-    mg_animations[mg_animation_cnt - 1].speed = 1000 / speed_fps;
-    mg_animations[mg_animation_cnt - 1].payload = payload;
-    mg_animations[mg_animation_cnt - 1].start_animation = start_cb;
-    mg_animations[mg_animation_cnt - 1].run_animation = run_cb;
-    mg_animations[mg_animation_cnt - 1].finish_animation = finish_cb;
+    memcpy(&mg_animations[mg_animation_cnt - 1], anim, sizeof(mg_animations[mg_animation_cnt - 1]));
+
     return (int32_t) mg_animation_cnt;
 }

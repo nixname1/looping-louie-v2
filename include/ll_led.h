@@ -25,14 +25,22 @@ struct color
 	uint8_t a; // alpha
 };
 
-void ll_led_init(void);
-void ll_led_run(void);
-void ll_led_update_all_leds(void);
-void ll_led_set_pixel_for_player(struct color *new_pixel, uint32_t pixel_number, uint32_t player);
-void ll_led_set_pixel(struct color *color, uint32_t led);
-void ll_led_set_alpha_for_player_pixel(uint8_t alpha, uint32_t pixel_number, uint32_t player);
-void ll_led_clear_all_pixel(void);
-void ll_led_shift_all_left(void);
-void ll_led_shift_all_right(void);
-void ll_led_shift_player_circle_right(uint32_t player);
+typedef void (*ll_led_renderer_render_frame_cb)(struct color *framebuffer);
+
+struct renderer
+{
+	ll_led_renderer_render_frame_cb render_frame_cb;
+};
+
+struct color *ll_led_create_framebuffer(void);
+void ll_led_shift_all_left(struct color *framebuffer);
+void ll_led_shift_all_right(struct color *framebuffer);
+void ll_led_shift_player_circle_right(struct color *framebuffer, uint32_t player);
+void ll_led_set_pixel_for_player(struct color *framebuffer, struct color *new_pixel, uint32_t pixel_number, uint32_t player);
+void ll_led_set_pixel(struct color *framebuffer, struct color *color, uint32_t led);
+void ll_led_set_alpha_for_player_pixel(struct color *framebuffer, uint8_t alpha, uint32_t pixel_number, uint32_t player);
+void ll_led_clear_pixel_of_player(struct color *framebuffer, uint32_t pixel_number, uint32_t player);
+void ll_led_clear_pixel(struct color *framebuffer, uint32_t pixel_number);
+void ll_led_clear_all_pixel(struct color *framebuffer);
+
 #endif

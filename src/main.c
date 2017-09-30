@@ -8,6 +8,9 @@
 #include "ll_external.h"
 #include "ll_anim.h"
 #include "ll_switch.h"
+#include "ll_led.h"
+#include "ll_renderer.h"
+#include "anim/system_boot.h"
 
 enum ll_system_step
 {
@@ -28,7 +31,9 @@ enum boot_step
     LL_BOOT_STEP_WAIT_FOR_ANIMATION
 };
 
-uint32_t run_system_boot()
+static uint32_t run_system_boot(void);
+
+static uint32_t run_system_boot()
 {
     static enum boot_step step = LL_BOOT_STEP_INIT;
     static uint64_t boot_time = 0;
@@ -65,18 +70,34 @@ int main(int argc, char *argv[])
 {
     UNUSED(argc);
     UNUSED(argv);
+
+    struct color *framebuffer;
+    struct renderer *renderer;
+    struct animation *animation;
     enum ll_system_step actual_system_step;
-    uint64_t boot_time = 0;
 
     trace_printf("SystemCoreClock: %lu\n", SystemCoreClock);
 
     ll_system_init();
 
+    framebuffer = ll_led_create_framebuffer();
+    renderer = ll_renderer_init();
+
+    if(!framebuffer || !renderer)
+        return -1;
+
+    animation = anim_system_boot_init(framebuffer);
+
+    if(!animation)
+        return -1;
+
+    ll_anim_add(animation);
+
     actual_system_step = LL_SYSTEM_STEP_BOOT;
     while (1)
     {
         ll_ext_run();
-        ll_anim_run();
+        ll_anim_run(ll_system_get_systime());
 
         switch (actual_system_step)
         {

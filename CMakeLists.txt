@@ -61,6 +61,7 @@ set(SOURCE_FILES
     src/ll_external.c
     src/ll_led.c
     src/ll_motor.c
+    src/ll_renderer.c
     src/ll_system.c
     src/ll_anim.c
     src/ll_player.c

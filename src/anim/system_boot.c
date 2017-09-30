@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "ll_anim.h"
 #include "ll_led.h"
 
@@ -12,18 +13,18 @@ struct payload
     uint8_t middle;
     uint8_t darkest;
     enum player player;
-} p;
+};
 
-uint32_t start_animation(void *payload);
-uint32_t run_animation(void *payload);
-uint32_t finish_animation(void *payload);
+uint32_t start_animation(struct color *framebuffer, void *payload);
+uint32_t run_animation(struct color *framebuffer, void *payload);
+uint32_t finish_animation(struct color *framebuffer, void *payload);
 
 /**
  * @brief start callback for animation
  * @param payload payload
  * @return 1 if finished, 0 if not yet
  */
-uint32_t start_animation(void *payload)
+uint32_t start_animation(struct color *framebuffer, void *payload)
 {
     uint32_t i, j;
     uint8_t alpha;
@@ -43,18 +44,18 @@ uint32_t start_animation(void *payload)
         for (j = 0; j < LL_LED_NUM_PER_CIRCLE / 2; j++)
         {
             alpha = ((double) 255 / (LL_LED_NUM_PER_CIRCLE / 2)) * (j + 1);
-            ll_led_set_pixel_for_player(c, LL_LED_NUM_PER_BAR + j, i);
-            ll_led_set_alpha_for_player_pixel(alpha, LL_LED_NUM_PER_BAR + j, i);
+            ll_led_set_pixel_for_player(framebuffer, c, LL_LED_NUM_PER_BAR + j, i);
+            ll_led_set_alpha_for_player_pixel(framebuffer, alpha, LL_LED_NUM_PER_BAR + j, i);
 
-            ll_led_set_pixel_for_player(c, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
-            ll_led_set_alpha_for_player_pixel(alpha, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
+            ll_led_set_pixel_for_player(framebuffer, c, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
+            ll_led_set_alpha_for_player_pixel(framebuffer, alpha, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
         }
 
-        ll_led_set_pixel_for_player(c, 0, i);
-        ll_led_set_alpha_for_player_pixel(45, 0, i);
-        //ll_led_set_pixel_for_player(c, 1, i);
-        //ll_led_set_alpha_for_player_pixel(127, 1, i);
-        ll_led_set_pixel_for_player(c, 1, i);
+        ll_led_set_pixel_for_player(framebuffer, c, 0, i);
+        ll_led_set_alpha_for_player_pixel(framebuffer, 45, 0, i);
+        //ll_led_set_pixel_for_player(framebuffer, c, 1, i);
+        //ll_led_set_alpha_for_player_pixel(framebuffer, 127, 1, i);
+        ll_led_set_pixel_for_player(framebuffer, c, 1, i);
     }
     p->dir = 0;
     p->brightest = 1;
@@ -69,12 +70,12 @@ uint32_t start_animation(void *payload)
  * @param payload payload
  * @return 1 if finished, 0 if not
  */
-uint32_t run_animation(void *payload)
+uint32_t run_animation(struct color *framebuffer, void *payload)
 {
     uint32_t i, j;
     struct payload *p = payload;
     struct color *color;
-    struct color no_color = {0, 0, 0};
+    struct color no_color = BLACK;
 
     if (p->delay_bars >= 2)
     {
@@ -147,18 +148,18 @@ uint32_t run_animation(void *payload)
             for (j = 0; j < LL_LED_NUM_PER_BAR; j++)
             {
                 if (j == p->brightest)
-                    ll_led_set_pixel_for_player(color, j, i);
+                    ll_led_set_pixel_for_player(framebuffer, color, j, i);
                 else if (j == p->middle)
                 {
-                    ll_led_set_pixel_for_player(color, j, i);
-                    ll_led_set_alpha_for_player_pixel(127, j, i);
+                    ll_led_set_pixel_for_player(framebuffer, color, j, i);
+                    ll_led_set_alpha_for_player_pixel(framebuffer, 127, j, i);
                 } else if (j == p->darkest)
                 {
-                    ll_led_set_pixel_for_player(color, j, i);
-                    ll_led_set_alpha_for_player_pixel(45, j, i);
+                    ll_led_set_pixel_for_player(framebuffer, color, j, i);
+                    ll_led_set_alpha_for_player_pixel(framebuffer, 45, j, i);
                 } else
                 {
-                    ll_led_set_pixel_for_player(&no_color, j, i);
+                    ll_led_set_pixel_for_player(framebuffer, &no_color, j, i);
                 }
             }
         }
@@ -172,7 +173,7 @@ uint32_t run_animation(void *payload)
     {
         for (i = 0; i < p->player; i++)
         {
-            ll_led_shift_player_circle_right(i);
+            ll_led_shift_player_circle_right(framebuffer, i);
         }
         p->delay_circ = 0;
     } else
@@ -186,28 +187,39 @@ uint32_t run_animation(void *payload)
  * @param payload payload
  * @return 1 if finished, 0 if not yet
  */
-uint32_t finish_animation(void *payload)
+uint32_t finish_animation(struct color *framebuffer, void *payload)
 {
     uint32_t i, j;
     struct payload *p = payload;
 
     // run the animation
-    run_animation(payload);
+    run_animation(framebuffer, payload);
 
     // and add fading out
     for (i = 0; i < p->player; i++)
     {
         for (j = 0; j < LL_LED_NUM_PER_PLAYER; j++)
         {
-            ll_led_set_alpha_for_player_pixel(255 / ((LL_LED_NUM_PER_PLAYER - (j + 1)) + 1), j, i);
+            ll_led_set_alpha_for_player_pixel(framebuffer, 255 / ((LL_LED_NUM_PER_PLAYER - (j + 1)) + 1), j, i);
         }
     }
 
     return 1;
 }
 
-void anim_system_boot_init(void)
+struct animation *anim_system_boot_init(struct color *framebuffer)
 {
-    p.player = LL_PLAYER_ALL;
-    ll_anim_add(start_animation, run_animation, finish_animation, 60, &p);
+	struct animation *anim = malloc(sizeof(*anim));
+	static struct payload payload;
+	if(!anim)
+		return NULL;
+
+	anim->payload = &payload;
+	anim->speed = 60;
+	anim->start_animation = start_animation;
+	anim->run_animation = run_animation;
+	anim->finish_animation = finish_animation;
+	anim->framebuffer = framebuffer;
+
+	return anim;
 }

@@ -1,6 +1,8 @@
 #ifndef LL_PLAYER_H_
 #define LL_PLAYER_H_
 
+#include <unistd.h>
+
 enum player
 {
     LL_PLAYER_0 = 0,
