@@ -79,7 +79,10 @@ void ll_anim_run(uint64_t system_time) {
             break;
     }
 
-    ll_renderer_render_frame(anim->framebuffer);
+	if(render_cb)
+	{
+		render_cb(anim->framebuffer);
+	}
 }
 
 /**
