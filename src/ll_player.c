@@ -1,5 +1,3 @@
-#include "stm32f411xe.h"
-
 #include "ll_player.h"
 #include "ll_led.h"
 
