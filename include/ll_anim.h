@@ -16,6 +16,7 @@ enum anim_step
 };
 
 typedef uint32_t (*animation_callback)(struct color *fb, void *payload);
+typedef void (*render_frame_cb)(struct color *framebuffer);
 
 struct animation
 {
@@ -40,7 +41,7 @@ enum LL_ANIMATION
     LL_ANIM_PLAYER_LOST_ALONE = 8
 };
 
-void ll_anim_init(struct renderer *renderer);
+void ll_anim_init(render_frame_cb cb);
 void ll_anim_run(uint64_t system_time);
 
 int32_t ll_anim_add(struct animation *anim);

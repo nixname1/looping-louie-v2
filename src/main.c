@@ -8,7 +8,6 @@
 #include "ll_external.h"
 #include "ll_anim.h"
 #include "ll_switch.h"
-#include "ll_led.h"
 #include "ll_renderer.h"
 #include "anim/system_boot.h"
 
@@ -72,7 +71,6 @@ int main(int argc, char *argv[])
     UNUSED(argv);
 
     struct color *framebuffer;
-    struct renderer *renderer;
     struct animation *animation;
     enum ll_system_step actual_system_step;
 
@@ -81,10 +79,12 @@ int main(int argc, char *argv[])
     ll_system_init();
 
     framebuffer = ll_led_create_framebuffer();
-    renderer = ll_renderer_init();
+    ll_renderer_init();
 
-    if(!framebuffer || !renderer)
+    if(!framebuffer)
         return -1;
+
+    ll_anim_init(ll_renderer_render_frame);
 
     animation = anim_system_boot_init(framebuffer);
 

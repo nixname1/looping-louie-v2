@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <memory.h>
-#include <ll_led.h>
 
+#include "ll_renderer.h"
 #include "ll_anim.h"
 
 enum animation_state
@@ -21,11 +21,11 @@ uint64_t mg_last_run = 0;
 uint32_t mg_animation_cnt = 0;
 struct animation *mg_animations = NULL;
 
-struct renderer *render;
+render_frame_cb render_cb = NULL;
 
-void ll_anim_init(struct renderer *renderer)
+void ll_anim_init(render_frame_cb cb)
 {
-	render = renderer;
+	render_cb = cb;
 }
 
 /**
@@ -78,6 +78,8 @@ void ll_anim_run(uint64_t system_time) {
             // as said - do nothing
             break;
     }
+
+    ll_renderer_render_frame(anim->framebuffer);
 }
 
 /**

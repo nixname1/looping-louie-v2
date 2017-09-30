@@ -6,33 +6,22 @@
 #include "ll_renderer.h"
 
 static void ll_renderer_render_pixel(struct color *col);
-static void ll_renderer_render_frame(struct color *framebuffer);
 
 /**
  * @brief   initializes the LED system
  */
-struct renderer *ll_renderer_init()
+void ll_renderer_init()
 {
-	struct renderer *renderer = malloc(sizeof(*renderer));
-
-	if(!renderer)
-	{
-		return NULL;
-	}
-
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 	GPIOC->MODER |= GPIO_MODER_MODER0_0;
 	GPIOC->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR0; // highest speed
-
-	renderer->render_frame_cb = ll_renderer_render_frame;
-
-	return renderer;
 }
 
 /**
  * @brief updates the color of all leds
  */
-static void ll_renderer_render_frame(struct color *framebuffer)
+
+void ll_renderer_render_frame(struct color *framebuffer)
 {
 	uint32_t i = 0;
 	while(i < LL_LED_NUM_LEDS)

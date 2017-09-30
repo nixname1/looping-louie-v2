@@ -3,6 +3,7 @@
 
 #include "ll_led.h"
 
-struct renderer *ll_renderer_init(void);
+void ll_renderer_init(void);
+void ll_renderer_render_frame(struct color *framebuffer);
 
 #endif

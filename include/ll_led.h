@@ -26,13 +26,6 @@ struct color
 	uint8_t a; // alpha
 };
 
-typedef void (*ll_led_renderer_render_frame_cb)(struct color *framebuffer);
-
-struct renderer
-{
-	ll_led_renderer_render_frame_cb render_frame_cb;
-};
-
 struct color *ll_led_create_framebuffer(void);
 void ll_led_shift_all_left(struct color *framebuffer);
 void ll_led_shift_all_right(struct color *framebuffer);
