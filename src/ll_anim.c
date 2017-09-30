@@ -38,7 +38,7 @@ void ll_anim_run(uint64_t system_time) {
     if (!mg_is_active)
         return;
 
-    if(system_time >= mg_last_run + anim->speed)
+    if(system_time >= mg_last_run + (1000/anim->speed))
     {
         mg_last_run = system_time;
     }
@@ -127,6 +127,7 @@ int32_t ll_anim_add(struct animation *anim)
     {
         return -1;
     }
+	mg_animations = tmp;
 
     memcpy(&mg_animations[mg_animation_cnt - 1], anim, sizeof(mg_animations[mg_animation_cnt - 1]));
 
