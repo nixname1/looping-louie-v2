@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-project(testing_ll)
+project(Looping_Louie_V2)
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR cortex-m4)
