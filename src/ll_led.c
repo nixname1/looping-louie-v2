@@ -64,6 +64,26 @@ void ll_led_shift_player_circle_right(struct color *framebuffer, uint32_t player
 }
 
 /**
+ * @brief shifts all colors of a bar for a specific player from outside to innerside
+ * @param
+ */
+void ll_led_shift_player_bar_down(struct color *framebuffer, uint32_t player)
+{
+	if (player >= LL_PLAYER_MAX_PLAYERS)
+		return;
+
+	uint32_t     i;
+	uint32_t     offset = player * LL_LED_NUM_PER_PLAYER;
+	struct color tmp    = framebuffer[offset];
+
+	for (i                  = 0; i + 1 < LL_LED_NUM_PER_BAR; i++)
+	{
+		framebuffer[offset + i] = framebuffer[offset + i + 1];
+	}
+	framebuffer[offset + i] = tmp;
+}
+
+/**
  * @brief set all leds for a player
  * @param   new_pixel   the colors; for every led one
  * @param   player      the number of the player to set the leds for
