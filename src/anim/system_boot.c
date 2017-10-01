@@ -3,6 +3,7 @@
 #include "ll_led.h"
 
 #include "anim/system_boot.h"
+#include "../../../simulation_renderer.h"
 
 struct payload
 {
@@ -26,8 +27,8 @@ uint32_t finish_animation(struct color *framebuffer, void *payload);
  */
 uint32_t start_animation(struct color *framebuffer, void *payload)
 {
-    uint32_t i, j;
-    uint8_t alpha;
+    uint8_t i, j;
+	uint8_t factor;
     struct payload *p = payload;
 
     p->player = LL_PLAYER_ALL;
@@ -38,23 +39,22 @@ uint32_t start_animation(struct color *framebuffer, void *payload)
     p->dir = 0;
     p->middle = 0;
 
+	simulation_renderer_render_frame(framebuffer);
+
     for (i = 0; i < p->player; i++)
     {
         struct color *c = ll_player_get_color_by_int(i);
         for (j = 0; j < LL_LED_NUM_PER_CIRCLE / 2; j++)
         {
-            alpha = ((double) 255 / (LL_LED_NUM_PER_CIRCLE / 2)) * (j + 1);
-            ll_led_set_pixel_for_player(framebuffer, c, LL_LED_NUM_PER_BAR + j, i);
-            ll_led_set_alpha_for_player_pixel(framebuffer, alpha, LL_LED_NUM_PER_BAR + j, i);
+	        factor = 255 / (LL_LED_NUM_PER_CIRCLE / 2);
+            c->a = factor * (j + (uint8_t) 1);
 
-            ll_led_set_pixel_for_player(framebuffer, c, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
-            ll_led_set_alpha_for_player_pixel(framebuffer, alpha, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE - j - 1), i);
+            ll_led_set_pixel_for_player(framebuffer, c, LL_LED_NUM_PER_BAR + j, i);
+            ll_led_set_pixel_for_player(framebuffer, c, (uint8_t) LL_LED_NUM_PER_BAR + ((uint8_t) LL_LED_NUM_PER_CIRCLE - j - (uint8_t) 1), i);
         }
 
         ll_led_set_pixel_for_player(framebuffer, c, 0, i);
         ll_led_set_alpha_for_player_pixel(framebuffer, 45, 0, i);
-        //ll_led_set_pixel_for_player(framebuffer, c, 1, i);
-        //ll_led_set_alpha_for_player_pixel(framebuffer, 127, 1, i);
         ll_led_set_pixel_for_player(framebuffer, c, 1, i);
     }
     p->dir = 0;
