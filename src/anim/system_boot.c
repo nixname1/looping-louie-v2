@@ -101,9 +101,8 @@ uint32_t finish_animation(struct color *framebuffer, void *payload)
 		{
 			ll_led_set_pixel(framebuffer, c, i);
 		}
-		if (p->zero_counter == 160)
+		if (p->zero_counter >= 160)
 		{
-			p->zero_counter++;
 			ret = 1;
 		}
 	}
