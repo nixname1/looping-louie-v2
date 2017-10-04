@@ -47,7 +47,8 @@ static void ll_renderer_render_pixel(struct color *col)
 	__disable_irq();
 	while (act_seq < 3)
 	{
-		curbyte = (uint8_t) (seq[act_seq] * 0.8 * col->a);
+		float factor = (float) col->a / 255;
+		curbyte = (uint8_t) (seq[act_seq] * 0.8 * factor);
 		act_bit_cnt = 0;
 		while (act_bit_cnt < 8)
 		{
