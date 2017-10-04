@@ -6,6 +6,8 @@
 
 struct payload
 {
+    uint32_t bar_cnt;
+    uint32_t ring_cnt;
 	uint32_t zero_counter;
 };
 
@@ -53,6 +55,8 @@ uint32_t start_animation(struct color *framebuffer, void *payload)
 	struct payload *p = payload;
 
 	p->zero_counter = 0;
+    p->bar_cnt = 0;
+    p->ring_cnt = 0;
 	set_initial_led_colors(framebuffer, p);
 
 	return 1;
@@ -65,14 +69,29 @@ uint32_t start_animation(struct color *framebuffer, void *payload)
  */
 uint32_t run_animation(struct color *framebuffer, void *payload)
 {
+    struct payload *p = payload;
 	uint32_t i;
 
-	for (i = 0; i < LL_PLAYER_MAX_PLAYERS; i++)
-	{
-		ll_led_shift_player_bar_down(framebuffer, i);
-		ll_led_shift_player_circle_right(framebuffer, i);
-	}
+    p->ring_cnt++;
+    p->bar_cnt++;
 
+
+    if(p->ring_cnt >= 2)
+    {
+        for (i = 0; i < LL_PLAYER_MAX_PLAYERS; i++)
+        {
+            ll_led_shift_player_circle_right(framebuffer, i);
+        }
+        p->ring_cnt = 0;
+    }
+    if(p->bar_cnt >= 3)
+    {
+        for (i = 0; i < LL_PLAYER_MAX_PLAYERS; i++)
+        {
+            ll_led_shift_player_bar_down(framebuffer, i);
+        }
+        p->bar_cnt = 0;
+    }
 	return 1;
 }
 
@@ -92,8 +111,8 @@ uint32_t finish_animation(struct color *framebuffer, void *payload)
 	for (i = 0; i < LL_LED_NUM_LEDS; i++)
 	{
 		struct color *c = &framebuffer[i];
-		c->a *= 0.8;
-		if (c->a < 10 && c->a > 0)
+		c->a *= 0.9;
+		if (c->a < 3 && c->a > 0)
 		{
 			p->zero_counter++;
 			ll_led_clear_pixel(framebuffer, i);
@@ -121,7 +140,7 @@ struct animation *anim_system_boot_init(struct color *framebuffer)
 		return NULL;
 
 	anim->payload          = &p;
-	anim->speed            = 20;
+	anim->speed            = 60;
 	anim->start_animation  = start_animation;
 	anim->run_animation    = run_animation;
 	anim->finish_animation = finish_animation;
