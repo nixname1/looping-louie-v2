@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <memory.h>
 
-#include "ll_renderer.h"
+#include "hardware/ll_renderer.h"
 #include "ll_anim.h"
 
 enum animation_state

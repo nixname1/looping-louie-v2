@@ -53,13 +53,14 @@ enum ll_ext_event
 };
 
 /** function type of callback */
-typedef void (*ll_ext_device_event_callback)(enum ll_ext_event);
+typedef void (*ll_ext_device_event_callback)(enum ll_ext_event, enum ll_ext_device device, uint64_t event_time);
+/** function to receive the new state of the external devices */
+typedef uint32_t (*ll_ext_state_update_cb)(void);
 
-void ll_ext_init(void);
-void ll_ext_run(void);
+void ll_ext_init(ll_ext_state_update_cb update_cb);
+void ll_ext_run(uint64_t systime);
 
 void ll_ext_set_event_callback(enum ll_ext_device device, ll_ext_device_event_callback callback);
 uint32_t ll_ext_is_device_active(uint32_t device);
-uint64_t ll_ext_get_last_readout_time(void);
 
 #endif

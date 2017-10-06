@@ -58,17 +58,19 @@ LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/ldscripts /usr/arm-none-eabi/lib/fpu /usr
 
 set(SOURCE_FILES
     src/_initialize_hardware.c
+    src/main.c
     src/ll_external.c
     src/ll_led.c
     src/ll_motor.c
-    src/ll_renderer.c
-    src/ll_system.c
+    src/hardware/ll_system.c
     src/ll_anim.c
     src/ll_player.c
     src/ll_game.c
-    src/anim/system_boot.c
     src/ll_switch.c
-    src/main.c
+    src/anim/system_boot.c
+    src/hardware/ll_gpio.c
+    src/hardware/ll_74hc166.c
+    src/hardware/ll_renderer.c
     #src/stm32f4xx_hal_msp.c
     system/src/cmsis/system_stm32f4xx.c
     system/src/cmsis/vectors_stm32f411xe.c

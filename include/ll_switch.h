@@ -3,8 +3,9 @@
 
 #include <stdint.h>
 
-void ll_switch_init(void);
-uint32_t ll_switch_is_turned_on(void);
-void ll_switch_set_virtual_state(uint32_t state);
+typedef uint32_t(*ll_switch_get_state_cb)(void);
 
-#endif //LL_SWITCH_H
+void ll_switch_init(ll_switch_get_state_cb read_state_cb);
+uint32_t ll_switch_is_turned_on(void);
+
+#endif

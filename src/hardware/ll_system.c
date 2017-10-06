@@ -2,15 +2,7 @@
 
 #include "stm32f4xx.h"
 
-#include "ll_motor.h"
-#include "ll_system.h"
-#include "ll_led.h"
-#include "ll_renderer.h"
-#include "ll_external.h"
-#include "ll_anim.h"
-#include "ll_switch.h"
-
-#include "anim/system_boot.h"
+#include "hardware/ll_system.h"
 
 void SysTick_Handler(void);
 static volatile uint32_t delay_timer;
@@ -26,14 +18,6 @@ void ll_system_init()
 
     // set the internal system counter to zero
     systick_counter = 0;
-#ifdef DEBUG
-    ll_system_debug_init();
-#endif
-
-    ll_system_rand_init();
-    ll_motor_init();
-    ll_ext_init();
-    ll_switch_init();
 }
 
 /**

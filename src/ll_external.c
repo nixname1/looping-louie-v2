@@ -1,82 +1,63 @@
+#include <stdint.h>
 #include <string.h>
 
-#include "stm32f4xx.h"
-
-#include "diag/Trace.h"
-
 #include "ll_external.h"
-#include "ll_system.h"
-
-inline static void clock_74hc166(void);
-inline static void reload_74hc166(void);
-uint32_t read_74hc166_data(void);
 
 /** the last state of the external devices */
-uint32_t mg_last_state = 0;
+uint32_t old_state = 0;
+
 /** the callbacks for the devices */
 ll_ext_device_event_callback mg_callbacks[LL_EXT_DEVICE_COUNT];
-/** the time of the last readout */
-uint64_t mg_last_readout_time = 0;
 
-/**
- * @brief inititalizes the External sources Module
- * Pins:
- * PIN  direction   usage
- * PC1  output      PE (active low at 74hc166)
- * PC4  output      clock
- * PC5  input       data in from 74hc166
- */
-void ll_ext_init(void)
+/** the time of the last update */
+uint64_t last_update_time = 0;
+
+ll_ext_state_update_cb update_callback = NULL;
+
+void ll_ext_init(ll_ext_state_update_cb update_cb)
 {
-    /**
-     * initialize control pins for 74HC166
-     */
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
-    GPIOC->MODER |= (GPIO_MODER_MODER1_0 | GPIO_MODER_MODER4_0);
-    GPIOC->OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR1 & GPIO_OSPEEDER_OSPEEDR4);
-
-    GPIOC->MODER &= ~(GPIO_MODER_MODER5);
-    GPIOC->PUPDR |= GPIO_PUPDR_PUPDR5_1;
-
-    //set PE to HIGH (it is LOW active)
-    GPIOC->BSRR = GPIO_BSRR_BS_1;
-
+	update_callback = update_cb;
     memset(mg_callbacks, 0, sizeof(mg_callbacks)/sizeof(*mg_callbacks));
 }
 
-/**
- * @brief handles the external devices
- */
-void ll_ext_run()
+void ll_ext_run(uint64_t systime)
 {
     uint32_t new_state;
-    uint32_t i;
 
-    if (ll_system_get_systime() > mg_last_readout_time + LL_EXT_POLL_TIME)
+    if (systime < last_update_time + LL_EXT_POLL_TIME)
     {
-        new_state = read_74hc166_data();
-        for(i = 0; i < LL_EXT_DEVICE_COUNT; i++)
-        {
-            if(mg_callbacks[i] == NULL)
-                continue;
+        return;
+    }
 
-            if(ll_ext_is_device_active(i))
+    if(!update_callback)
+    {
+        return;
+    }
+
+    new_state = update_callback();
+    for (enum ll_ext_device i = LL_EXT_DEVICE_LB_PLAYER0; i < LL_EXT_DEVICE_COUNT; i++)
+    {
+        if (mg_callbacks[i] == NULL)
+        {
+            continue;
+        }
+
+        if (ll_ext_is_device_active(i))
+        {
+            if (!(new_state & ((uint32_t) 1 << i)))
             {
-                if(!(new_state & ((uint32_t) 1 << i)))
-                {
-                    mg_callbacks[i](LL_EXT_EVENT_END);
-                }
+                mg_callbacks[i](LL_EXT_EVENT_END, i, systime);
             }
-            else
+        } else
+        {
+            if ((new_state & ((uint32_t) 1 << i)))
             {
-                if((new_state & ((uint32_t) 1 << i)))
-                {
-                    mg_callbacks[i](LL_EXT_EVENT_START);
-                }
+                mg_callbacks[i](LL_EXT_EVENT_START, i, systime);
             }
         }
-        mg_last_state = new_state;
     }
+    old_state = new_state;
+
 }
 
 /**
@@ -95,60 +76,5 @@ void ll_ext_set_event_callback(enum ll_ext_device device, ll_ext_device_event_ca
  */
 uint32_t ll_ext_is_device_active(uint32_t device)
 {
-    return (mg_last_state & ((uint32_t) 1 << device)) >> device;
-}
-
-/**
- * @brief   returns the time of the last device update
- * @retval  timestamp of last update
- */
-uint64_t ll_ext_get_last_readout_time(void)
-{
-    return mg_last_readout_time;
-}
-
-/**
- * @brief reads the data from HC166
- * @retval  the data read from HC166
- */
-uint32_t read_74hc166_data(void)
-{
-    uint32_t i;
-    uint32_t data = 0;
-    uint32_t bit;
-
-    reload_74hc166();
-
-    mg_last_readout_time = ll_system_get_systime();
-
-    for (i = 0; i < LL_EXT_DEVICE_COUNT; i++)
-    {
-        bit = (GPIOC->IDR & GPIO_IDR_IDR_5);
-        bit >>= 5;
-        data |= bit << (i);
-        clock_74hc166();
-    }
-    return data;
-}
-
-/**
- * @brief reloads the 74hc166 with actual values
- */
-inline static void reload_74hc166()
-{
-    // enables PE (active LOW on 74hc166)
-    GPIOC->BSRR = GPIO_BSRR_BR_1;
-    // give a clock to 74hc166 so it loads the actual state
-    clock_74hc166();
-    // disable PE again
-    GPIOC->BSRR = GPIO_BSRR_BS_1;
-}
-
-/**
- * @brief give a clock to the HC166
- */
-inline static void clock_74hc166()
-{
-    GPIOC->BSRR = GPIO_BSRR_BS_4;
-    GPIOC->BSRR = GPIO_BSRR_BR_4;
+    return (old_state & ((uint32_t) 1 << device)) >> device;
 }

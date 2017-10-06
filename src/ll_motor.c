@@ -3,7 +3,7 @@
 #include "stm32f4xx.h"
 #include "diag/Trace.h"
 
-#include "ll_system.h"
+#include "hardware/ll_system.h"
 #include "ll_motor.h"
 
 static uint64_t mg_next_speed_change = 0;

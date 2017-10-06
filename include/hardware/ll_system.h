@@ -7,6 +7,8 @@
 #define SYSTICK_SPEED_1us	(1000000)
 #define SYSTICK_TIMER_SPEED SYSTICK_SPEED_100us
 
+#include <stdint.h>
+
 void ll_system_init(void);
 
 /** game handling */

@@ -1,9 +1,9 @@
 #include <stdlib.h>
 
 #include "stm32f4xx.h"
-#include "ll_system.h"
+#include "hardware/ll_system.h"
 #include "ll_led.h"
-#include "ll_renderer.h"
+#include "hardware/ll_renderer.h"
 
 static void ll_renderer_render_pixel(struct color *col);
 
