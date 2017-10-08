@@ -14,9 +14,10 @@ enum ll_game_state
 
 struct game
 {
-	uint32_t player_chips[8];
 	uint32_t motor_speed;
 	struct color *framebuffer;
+	struct player *player;
+	uint32_t player_count;
 	enum ll_game_state state;
 	uint8_t PADDING_1;
 	uint8_t PADDING_2;
@@ -26,11 +27,12 @@ struct game
 
 void ll_game_loop_run(struct game *game, uint64_t systime);
 
+void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrier, uint64_t event_time, void *payload);
 /**
  * @brief creates a new game object
  * @return
  */
-struct game *ll_game_create(void);
+struct game *ll_game_create(struct player *player, uint32_t player_count);
 /**
  * @brief starts a new game
  * @param game the game to start

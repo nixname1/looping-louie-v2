@@ -47,7 +47,7 @@ void ll_led_shift_all_right(struct color *framebuffer)
  */
 void ll_led_shift_player_circle_right(struct color *framebuffer, uint32_t player)
 {
-    if(player >= LL_PLAYER_MAX_PLAYERS)
+    if(player >= LL_PLAYER_NUM_PLAYERS)
         return;
 
     uint32_t i;
@@ -69,7 +69,7 @@ void ll_led_shift_player_circle_right(struct color *framebuffer, uint32_t player
  */
 void ll_led_shift_player_bar_down(struct color *framebuffer, uint32_t player)
 {
-	if (player >= LL_PLAYER_MAX_PLAYERS)
+	if (player >= LL_PLAYER_NUM_PLAYERS)
 		return;
 
 	uint32_t     i;

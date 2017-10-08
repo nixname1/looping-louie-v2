@@ -2,7 +2,7 @@
 
 #include "ll_anim.h"
 #include "ll_switch.h"
-#include "ll_external.h"
+#include "ll_lightbarrier.h"
 #include "ll_game.h"
 
 enum ll_system_step
@@ -56,8 +56,9 @@ static uint32_t run_system_boot(uint64_t systime)
 	return 0;
 }
 
-static void chip_event_callback(enum ll_ext_event event, enum ll_ext_device device, uint64_t event_time)
+void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrier, uint64_t event_time, void *payload)
 {
+    struct game *game = payload;
 	static uint64_t event_start_time;
 	static uint64_t event_end_time;
 
@@ -68,34 +69,24 @@ static void chip_event_callback(enum ll_ext_event event, enum ll_ext_device devi
 	else if(event == LL_EXT_EVENT_END)
 	{
 		event_end_time = event_time;
-
-		if(event_end_time - event_start_time > LL_EXT_LONG_EVENT_TIME)
+		if(game->player[lightbarrier].chips > 0)
 		{
-			// it was a long event
-		}
-		else
-		{
-
+            game->player[lightbarrier].chips--;
 		}
 	}
 }
 
-struct game *ll_game_create()
+struct game *ll_game_create(struct player *player, uint32_t player_count)
 {
 	struct game *game = malloc(sizeof(*game));
-	if(game)
+	if(!game)
 	{
-		game->state = LL_GAME_STATE_STOPPED;
-		game->motor_speed = 0;
-		for(uint32_t i = 0; i < LL_PLAYER_MAX_PLAYERS; i++ )
-		{
-			game->player_chips[i] = 3;
-		}
-		for(enum ll_ext_device i = LL_EXT_DEVICE_LB_PLAYER0; i < LL_EXT_DEVICE_COUNT; i++)
-		{
-			ll_ext_set_event_callback(i, chip_event_callback);
-		}
+		return NULL;
 	}
+	game->state = LL_GAME_STATE_STOPPED;
+	game->motor_speed = 0;
+	game->player = player;
+	game->player_count = player_count;
 	return game;
 }
 
@@ -123,7 +114,7 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 {
 	static enum ll_system_step actual_system_step = LL_SYSTEM_STEP_BOOT;
 
-	ll_ext_run(systime);
+	ll_lb_run(systime, game);
 	ll_anim_run(systime);
 
 	switch (actual_system_step)

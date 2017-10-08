@@ -23,9 +23,9 @@ static void set_initial_led_colors(struct color *framebuffer, struct payload *p)
 	uint8_t i, j;
 	uint8_t factor;
 
-	for (i = 0; i < LL_PLAYER_MAX_PLAYERS; i++)
+	for (i = 0; i < LL_PLAYER_NUM_PLAYERS; i++)
 	{
-		struct color *c = ll_player_get_color_by_int(i);
+		struct color *c = ll_player_get_color(i);
 		for (j = 0; j < LL_LED_NUM_PER_CIRCLE / 2; j++)
 		{
 			factor = 255 / (LL_LED_NUM_PER_CIRCLE / 2);
@@ -78,7 +78,7 @@ uint32_t run_animation(struct color *framebuffer, void *payload)
 
     if(p->ring_cnt >= 2)
     {
-        for (i = 0; i < LL_PLAYER_MAX_PLAYERS; i++)
+        for (i = 0; i < LL_PLAYER_NUM_PLAYERS; i++)
         {
             ll_led_shift_player_circle_right(framebuffer, i);
         }
@@ -86,7 +86,7 @@ uint32_t run_animation(struct color *framebuffer, void *payload)
     }
     if(p->bar_cnt >= 3)
     {
-        for (i = 0; i < LL_PLAYER_MAX_PLAYERS; i++)
+        for (i = 0; i < LL_PLAYER_NUM_PLAYERS; i++)
         {
             ll_led_shift_player_bar_down(framebuffer, i);
         }

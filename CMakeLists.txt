@@ -59,7 +59,7 @@ LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/ldscripts /usr/arm-none-eabi/lib/fpu /usr
 set(SOURCE_FILES
     src/_initialize_hardware.c
     src/main.c
-    src/ll_external.c
+        src/ll_lightbarrier.c
     src/ll_led.c
     src/ll_motor.c
     src/hardware/ll_system.c

@@ -1,7 +1,7 @@
 
 #include "stm32f4xx.h"
 
-#include "ll_external.h"
+#include "ll_lightbarrier.h"
 #include "hardware/ll_74hc166.h"
 
 
@@ -39,7 +39,7 @@ uint32_t ll_74hc166_read_data()
 
 	reload_74hc166();
 
-	for (i = 0; i < LL_EXT_DEVICE_COUNT; i++)
+	for (i = 0; i < LL_LB_COUNT; i++)
 	{
 		bit = (GPIOC->IDR & GPIO_IDR_IDR_5);
 		bit >>= 5;

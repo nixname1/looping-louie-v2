@@ -8,7 +8,7 @@
 #define LL_LED_NUM_PER_BAR      (8)
 #define LL_LED_NUM_PER_PLAYER   (LL_LED_NUM_PER_BAR + LL_LED_NUM_PER_CIRCLE)
 
-#define LL_LED_NUM_LEDS (LL_LED_NUM_PER_PLAYER * LL_PLAYER_MAX_PLAYERS)
+#define LL_LED_NUM_LEDS (LL_LED_NUM_PER_PLAYER * LL_PLAYER_NUM_PLAYERS)
 
 #define RED     ((struct color) {255, 0, 0, 255})
 #define GREEN   ((struct color) {0, 255, 0, 255})
