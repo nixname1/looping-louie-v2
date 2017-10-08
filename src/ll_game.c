@@ -56,6 +56,32 @@ static uint32_t run_system_boot(uint64_t systime)
 	return 0;
 }
 
+static uint32_t start_new_round(struct game *game)
+{
+    uint32_t ret = 0;
+
+    if(!ll_anim_is_active())
+    {
+        ret = 1;
+    }
+
+    return ret;
+}
+
+static uint32_t run_round(struct game *game)
+{
+    uint32_t ret = 0;
+
+    return ret;
+}
+
+static uint32_t end_round(struct game *game)
+{
+    uint32_t ret = 0;
+
+    return ret;
+}
+
 void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrier, uint64_t event_time, void *payload)
 {
     struct game *game = payload;
@@ -90,14 +116,46 @@ struct game *ll_game_create(struct player *player, uint32_t player_count)
 	return game;
 }
 
-void ll_game_start(struct game *game)
+uint32_t ll_game_start(struct game *game)
 {
+    uint32_t ret = 0;
 	game->state = LL_GAME_STATE_STARTING;
+    ll_anim_activate(LL_ANIM_GAME_START);
+    return ret;
 }
 
-void ll_game_run(struct game *game)
+uint32_t ll_game_run(struct game *game)
 {
+    uint32_t ret = 0;
+    uint32_t round_ret = 0;
 	game->state = LL_GAME_STATE_RUNNING;
+
+    switch(game->round_step)
+    {
+        case LL_ROUND_STEP_START:
+            if(start_new_round(game))
+            {
+                game->round_step = LL_ROUND_STEP_RUN;
+            }
+            break;
+
+        case LL_ROUND_STEP_RUN:
+            round_ret = run_round(game);
+            if(round_ret)
+            {
+                game->round_step = LL_ROUND_STEP_END;
+            }
+            break;
+
+        case LL_ROUND_STEP_END:
+            if(end_round(game))
+            {
+                ret = 1;
+            }
+            break;
+    }
+
+    return ret;
 }
 
 void ll_game_pause(struct game *game)
@@ -126,8 +184,10 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 
 		case LL_SYSTEM_STEP_GAME_START:
 			// TODO: print game start animation
-			ll_game_start(game);
-			actual_system_step = LL_SYSTEM_STEP_GAME_RUN;
+			if(ll_game_start(game))
+            {
+                actual_system_step = LL_SYSTEM_STEP_GAME_RUN;
+            }
 			break;
 
 		case LL_SYSTEM_STEP_GAME_RUN:

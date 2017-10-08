@@ -12,6 +12,13 @@ enum ll_game_state
 	LL_GAME_STATE_PAUSED,
 };
 
+enum game_round_step
+{
+    LL_ROUND_STEP_START,
+    LL_ROUND_STEP_RUN,
+    LL_ROUND_STEP_END
+};
+
 struct game
 {
 	uint32_t motor_speed;
@@ -19,7 +26,7 @@ struct game
 	struct player *player;
 	uint32_t player_count;
 	enum ll_game_state state;
-	uint8_t PADDING_1;
+	enum game_round_step round_step;
 	uint8_t PADDING_2;
 	uint8_t PADDING_3;
 };
@@ -37,13 +44,13 @@ struct game *ll_game_create(struct player *player, uint32_t player_count);
  * @brief starts a new game
  * @param game the game to start
  */
-void ll_game_start(struct game *game);
+uint32_t ll_game_start(struct game *game);
 
 /**
  * @brief runs the actual game
  * @param game the game to run
  */
-void ll_game_run(struct game *game);
+uint32_t ll_game_run(struct game *game);
 
 /**
  * @brief pauses the actual game
