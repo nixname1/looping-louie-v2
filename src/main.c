@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
 
     framebuffer = ll_led_create_framebuffer();
     ll_renderer_init();
+    ll_renderer_render_frame(framebuffer);
 
     if(!framebuffer)
         return -1;
