@@ -2,6 +2,8 @@
 #define LL_GAME_H
 
 #include "ll_led.h"
+#include "ll_lightbarrier.h"
+#include "ll_player.h"
 
 enum ll_game_state
 {
