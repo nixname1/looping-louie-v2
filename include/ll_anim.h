@@ -41,10 +41,12 @@ enum LL_ANIMATION
     LL_ANIM_PLAYER_LOST_ALONE = 8
 };
 
+#define LL_ANIM_NUM_ANIMATIONS (9)
+
 void ll_anim_init(render_frame_cb cb);
 void ll_anim_run(uint64_t system_time);
 
-int32_t ll_anim_add(struct animation *anim);
+int32_t ll_anim_add(enum LL_ANIMATION anim_name, struct animation *anim);
 void ll_anim_activate(enum LL_ANIMATION animation);
 uint32_t ll_anim_is_active(void);
 void ll_anim_stop_animation(void);

@@ -19,6 +19,7 @@
 #include "hardware/ll_system.h"
 
 #include "anim/system_boot.h"
+#include "anim/game_start.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
@@ -53,7 +54,10 @@ int main(int argc, char *argv[])
         return -1;
 
     ll_anim_init(ll_renderer_render_frame);
-    ll_anim_add(anim_system_boot_init(framebuffer));
+    ll_anim_add(LL_ANIM_SYSTEM_BOOT, anim_system_boot_init(framebuffer));
+    ll_anim_add(LL_ANIM_GAME_START, anim_game_start_init(framebuffer));
+
+    ll_lb_init(ll_74hc166_read_data, ll_game_lb_event_callback);
 
     player = malloc(sizeof(*player) * LL_PLAYER_NUM_PLAYERS);
     for(uint32_t i = 0; i < LL_PLAYER_NUM_PLAYERS; i++)
@@ -63,7 +67,6 @@ int main(int argc, char *argv[])
         player[i].color = ll_player_get_color(i);
         player[i].lost_count = 0;
     }
-    ll_lb_init(ll_74hc166_read_data, ll_game_lb_event_callback);
 	game = ll_game_create(player, LL_PLAYER_NUM_PLAYERS);
     while (1)
     {

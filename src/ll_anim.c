@@ -18,8 +18,7 @@ enum LL_ANIMATION mg_actual_animation;
 uint32_t mg_is_active = 0;
 uint64_t mg_last_run = 0;
 
-uint32_t mg_animation_cnt = 0;
-struct animation *mg_animations = NULL;
+struct animation mg_animations[LL_ANIM_NUM_ANIMATIONS];
 
 render_frame_cb render_cb = NULL;
 
@@ -113,23 +112,13 @@ void ll_anim_activate(enum LL_ANIMATION animation)
     mg_is_active = 1;
 }
 
-int32_t ll_anim_add(struct animation *anim)
+int32_t ll_anim_add(enum LL_ANIMATION anim_name, struct animation *anim)
 {
     if(!anim)
     {
         return -1;
     }
 
-    mg_animation_cnt++;
-    void *tmp;
-    tmp = realloc(mg_animations, sizeof(*mg_animations) * mg_animation_cnt);
-    if(tmp == NULL)
-    {
-        return -1;
-    }
-	mg_animations = tmp;
-
-    memcpy(&mg_animations[mg_animation_cnt - 1], anim, sizeof(mg_animations[mg_animation_cnt - 1]));
-
-    return (int32_t) mg_animation_cnt;
+    memcpy(&mg_animations[anim_name], anim, sizeof(mg_animations[anim_name]));
+    return 0;
 }
