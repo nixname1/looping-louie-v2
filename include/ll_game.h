@@ -18,7 +18,8 @@ enum game_round_step
 {
     LL_ROUND_STEP_START,
     LL_ROUND_STEP_RUN,
-    LL_ROUND_STEP_END
+    LL_ROUND_STEP_END,
+	LL_ROUND_STEP_WAIT
 };
 
 struct game

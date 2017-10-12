@@ -4,11 +4,14 @@
 #include <stdint.h>
 #include "ll_player.h"
 
-#define LL_LED_NUM_PER_CIRCLE   (12)
-#define LL_LED_NUM_PER_BAR      (8)
-#define LL_LED_NUM_PER_PLAYER   (LL_LED_NUM_PER_BAR + LL_LED_NUM_PER_CIRCLE)
-
-#define LL_LED_NUM_LEDS (LL_LED_NUM_PER_PLAYER * LL_PLAYER_NUM_PLAYERS)
+#define LL_LED_NUM_PER_CIRCLE            (12)
+#define LL_LED_NUM_PER_BAR               (8)
+#define LL_LED_NUM_STRIPE                (115)
+#define LL_LED_NUM_STRIPE_PER_PLAYER     ((float)LL_LED_NUM_STRIPE/LL_PLAYER_NUM_PLAYERS)
+#define LL_LED_NUM_PER_PLAYER            (LL_LED_NUM_PER_BAR + LL_LED_NUM_PER_CIRCLE)
+#define LL_LED_NUM_ALL_BARS_CIRCLES      ((LL_LED_NUM_PER_CIRCLE + LL_LED_NUM_PER_BAR) * LL_PLAYER_NUM_PLAYERS)
+#define LL_LED_NUM_BAR_CIRCLE_PER_PLAYER (LL_LED_NUM_PER_CIRCLE + LL_LED_NUM_PER_BAR)
+#define LL_LED_NUM_LEDS ((LL_LED_NUM_PER_PLAYER * LL_PLAYER_NUM_PLAYERS) + LL_LED_NUM_STRIPE)
 
 #define RED     ((struct color) {255, 0, 0, 255})
 #define GREEN   ((struct color) {0, 255, 0, 255})

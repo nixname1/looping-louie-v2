@@ -150,9 +150,13 @@ uint32_t ll_game_run(struct game *game)
         case LL_ROUND_STEP_END:
             if(end_round(game))
             {
-                ret = 1;
+                game->round_step = LL_ROUND_STEP_WAIT;
             }
             break;
+
+		case LL_ROUND_STEP_WAIT:
+			ret = 1;
+			break;
     }
 
     return ret;
