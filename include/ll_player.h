@@ -13,6 +13,6 @@ struct player
     const struct color *color;
 };
 
-const struct color *ll_player_get_color(uint32_t player);
+struct color *ll_player_get_color(uint32_t player);
 
 #endif

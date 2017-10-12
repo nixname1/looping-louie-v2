@@ -8,7 +8,7 @@
  * @param player the player
  * @return the color for the player
  */
-const struct color *ll_player_get_color(uint32_t player)
+struct color *ll_player_get_color(uint32_t player)
 {
     static struct color c;
     switch(player)
