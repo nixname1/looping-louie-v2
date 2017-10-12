@@ -1,4 +1,5 @@
 
+#include <cmsis/stm32f411xe.h>
 #include "stm32f4xx.h"
 
 #include "ll_lightbarrier.h"
@@ -10,8 +11,8 @@
  */
 inline static void clock_74hc166(void)
 {
-	GPIOC->BSRR = GPIO_BSRR_BS_4;
-	GPIOC->BSRR = GPIO_BSRR_BR_4;
+	GPIOB->BSRR = GPIO_BSRR_BS_13;
+	GPIOB->BSRR = GPIO_BSRR_BR_13;
 }
 
 /**
@@ -41,8 +42,8 @@ uint32_t ll_74hc166_read_data()
 
 	for (i = 0; i < LL_LB_COUNT; i++)
 	{
-		bit = (GPIOC->IDR & GPIO_IDR_IDR_5);
-		bit >>= 5;
+		bit = (GPIOC->IDR & GPIO_IDR_IDR_2);
+		bit >>= 2;
 		data |= bit << (i);
 		clock_74hc166();
 	}
@@ -54,12 +55,16 @@ void ll_74hc166_init()
 	/**
  * initialize control pins for 74HC166
  */
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
-	GPIOC->MODER |= (GPIO_MODER_MODER1_0 | GPIO_MODER_MODER4_0);
-	GPIOC->OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR1 & GPIO_OSPEEDER_OSPEEDR4);
+	RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOCEN | RCC_AHB1ENR_GPIOBEN);
 
-	GPIOC->MODER &= ~(GPIO_MODER_MODER5);
-	GPIOC->PUPDR |= GPIO_PUPDR_PUPDR5_1;
+	GPIOC->MODER |= GPIO_MODER_MODER1_0;
+	GPIOB->MODER |= GPIO_MODER_MODER13_0;
+
+	GPIOC->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR1;
+    GPIOB->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR13;
+
+	GPIOC->MODER &= ~(GPIO_MODER_MODER2);
+	GPIOC->PUPDR |= GPIO_PUPDR_PUPDR2_1;
 
 	//set PE to HIGH (it is LOW active)
 	GPIOC->BSRR = GPIO_BSRR_BS_1;
