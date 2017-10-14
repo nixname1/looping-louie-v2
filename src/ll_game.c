@@ -138,11 +138,13 @@ uint32_t ll_game_start(struct game *game)
 		case 2:
 			if(!ll_anim_is_active())
 			{
+				state = 0;
 				return 1;
 			}
 			break;
 
 		default:
+			state = 0;
 			return 1;
 	}
     return 0;
