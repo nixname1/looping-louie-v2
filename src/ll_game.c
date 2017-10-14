@@ -110,6 +110,7 @@ struct game *ll_game_create(struct player *player, uint32_t player_count)
 		return NULL;
 	}
 	game->state = LL_GAME_STATE_STOPPED;
+	game->round_step = LL_ROUND_STEP_START;
 	game->motor_speed = 0;
 	game->player = player;
 	game->player_count = player_count;
@@ -118,10 +119,33 @@ struct game *ll_game_create(struct player *player, uint32_t player_count)
 
 uint32_t ll_game_start(struct game *game)
 {
-    uint32_t ret = 0;
+    static uint32_t state = 0;
 	game->state = LL_GAME_STATE_STARTING;
-    ll_anim_activate(LL_ANIM_GAME_START);
-    return ret;
+
+	switch(state)
+	{
+		case 0:
+			ll_anim_activate(LL_ANIM_GAME_START);
+			state = 1;
+			break;
+		case 1:
+			if(ll_anim_is_active())
+			{
+				ll_anim_stop_animation();
+				state = 2;
+			}
+			break;
+		case 2:
+			if(!ll_anim_is_active())
+			{
+				return 1;
+			}
+			break;
+
+		default:
+			return 1;
+	}
+    return 0;
 }
 
 uint32_t ll_game_run(struct game *game)
@@ -187,7 +211,6 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 			break;
 
 		case LL_SYSTEM_STEP_GAME_START:
-			// TODO: print game start animation
 			if(ll_game_start(game))
             {
                 actual_system_step = LL_SYSTEM_STEP_GAME_RUN;
