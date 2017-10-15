@@ -24,6 +24,43 @@ enum boot_step
 	LL_BOOT_STEP_WAIT_FOR_ANIMATION
 };
 
+enum round_result
+{
+	ROUND_RESULT_PLAYING,
+	ROUND_RESULT_PLAYER_LOST,
+	ROUND_RESULT_PAUSED
+};
+
+enum game_result
+{
+	GAME_RESULT_PLAYING,
+	GAME_RESULT_PAUSED,
+	GAME_RESULT_END
+};
+
+void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrier, uint64_t event_time, void *payload)
+{
+	struct game *game = payload;
+	static uint64_t event_start_time;
+	static uint64_t event_end_time;
+
+	if(event == LL_EXT_EVENT_START)
+	{
+		event_start_time = event_time;
+	}
+	else if(event == LL_EXT_EVENT_END)
+	{
+		event_end_time = event_time;
+		if(game->state == LL_GAME_STATE_RUNNING && game->round_step == LL_ROUND_STEP_RUN)
+		{
+			if (game->player[lightbarrier].chips > 0)
+			{
+				game->player[lightbarrier].chips--;
+			}
+		}
+	}
+}
+
 static uint32_t run_system_boot(uint64_t systime)
 {
 	static enum boot_step step = LL_BOOT_STEP_INIT;
@@ -60,17 +97,30 @@ static uint32_t start_new_round(struct game *game)
 {
     uint32_t ret = 0;
 
-    if(!ll_anim_is_active())
-    {
-        ret = 1;
-    }
+	if(game->round_counter == 0)
+	{
+		return 1;
+	}
 
+	// TODO: activate whence LL_ANIM_ROUND_START is implemented
+	//ll_anim_activate(LL_ANIM_ROUND_START);
+	//ll_anim_stop_animation();
     return ret;
 }
 
-static uint32_t run_round(struct game *game)
+static enum round_result run_round(struct game *game)
 {
-    uint32_t ret = 0;
+    enum round_result ret = ROUND_RESULT_PLAYING;
+
+	// TODO: run motor here
+
+	for(uint32_t i = 0; i < game->player_count; i++)
+	{
+		if(game->player[i].chips < 1)
+		{
+			return ROUND_RESULT_PLAYER_LOST;
+		}
+	}
 
     return ret;
 }
@@ -82,78 +132,19 @@ static uint32_t end_round(struct game *game)
     return ret;
 }
 
-void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrier, uint64_t event_time, void *payload)
+static uint32_t ll_game_start(struct game *game)
 {
-    struct game *game = payload;
-	static uint64_t event_start_time;
-	static uint64_t event_end_time;
-
-	if(event == LL_EXT_EVENT_START)
-	{
-		event_start_time = event_time;
-	}
-	else if(event == LL_EXT_EVENT_END)
-	{
-		event_end_time = event_time;
-		if(game->player[lightbarrier].chips > 0)
-		{
-            game->player[lightbarrier].chips--;
-		}
-	}
-}
-
-struct game *ll_game_create(struct player *player, uint32_t player_count)
-{
-	struct game *game = malloc(sizeof(*game));
-	if(!game)
-	{
-		return NULL;
-	}
-	game->state = LL_GAME_STATE_STOPPED;
-	game->round_step = LL_ROUND_STEP_START;
-	game->motor_speed = 0;
-	game->player = player;
-	game->player_count = player_count;
-	return game;
-}
-
-uint32_t ll_game_start(struct game *game)
-{
-    static uint32_t state = 0;
 	game->state = LL_GAME_STATE_STARTING;
 
-	switch(state)
-	{
-		case 0:
-			ll_anim_activate(LL_ANIM_GAME_START);
-			state = 1;
-			break;
-		case 1:
-			if(ll_anim_is_active())
-			{
-				ll_anim_stop_animation();
-				state = 2;
-			}
-			break;
-		case 2:
-			if(!ll_anim_is_active())
-			{
-				state = 0;
-				return 1;
-			}
-			break;
+	ll_anim_activate(LL_ANIM_GAME_START);
+	ll_anim_stop_animation();
 
-		default:
-			state = 0;
-			return 1;
-	}
-    return 0;
+	return 1;
 }
 
-uint32_t ll_game_run(struct game *game)
+static enum game_result ll_game_run(struct game *game)
 {
-    uint32_t ret = 0;
-    uint32_t round_ret = 0;
+	enum game_result ret = GAME_RESULT_PLAYING;
 	game->state = LL_GAME_STATE_RUNNING;
 
     switch(game->round_step)
@@ -166,34 +157,42 @@ uint32_t ll_game_run(struct game *game)
             break;
 
         case LL_ROUND_STEP_RUN:
-            round_ret = run_round(game);
-            if(round_ret)
-            {
-                game->round_step = LL_ROUND_STEP_END;
-            }
+		    switch(run_round(game))
+		    {
+			    case ROUND_RESULT_PLAYING:
+				    break;
+
+			    case ROUND_RESULT_PLAYER_LOST:
+				    game->round_step = LL_ROUND_STEP_END;
+				    break;
+
+			    case ROUND_RESULT_PAUSED:
+
+				    break;
+		    }
             break;
 
         case LL_ROUND_STEP_END:
             if(end_round(game))
             {
                 game->round_step = LL_ROUND_STEP_WAIT;
+	            game->round_counter++;
             }
             break;
 
 		case LL_ROUND_STEP_WAIT:
-			ret = 1;
 			break;
     }
 
     return ret;
 }
 
-void ll_game_pause(struct game *game)
+static void ll_game_pause(struct game *game)
 {
 	game->state = LL_GAME_STATE_PAUSED;
 }
 
-void ll_game_stop(struct game *game)
+static void ll_game_stop(struct game *game)
 {
 	game->state = LL_GAME_STATE_STOPPING;
 }
@@ -220,10 +219,19 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 			break;
 
 		case LL_SYSTEM_STEP_GAME_RUN:
-			// TODO: run the game and its logic
-			// TODO: whence a player lost -> exit game
-			ll_game_run(game);
-			actual_system_step = LL_SYSTEM_STEP_GAME_EXIT;
+			switch(ll_game_run(game))
+			{
+				case GAME_RESULT_PLAYING:
+					break;
+
+				case GAME_RESULT_PAUSED:
+					actual_system_step = LL_SYSTEM_STEP_GAME_PAUSE;
+					break;
+
+				case GAME_RESULT_END:
+					actual_system_step = LL_SYSTEM_STEP_GAME_EXIT;
+					break;
+			}
 			break;
 
 		case LL_SYSTEM_STEP_GAME_PAUSE:
@@ -241,7 +249,7 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 
 		case LL_SYSTEM_STEP_STANDBY:
 			// TODO: print some standby animation
-			actual_system_step = LL_SYSTEM_STEP_BOOT;
+			//actual_system_step = LL_SYSTEM_STEP_BOOT;
 			break;
 
 		case LL_SYSTEM_STEP_ERROR:
@@ -250,4 +258,20 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 		case LL_SYSTEM_STEP_SHUTDOWN:
 			break;
 	}
+}
+
+struct game *ll_game_create(struct player *player, uint32_t player_count)
+{
+	struct game *game = malloc(sizeof(*game));
+	if(!game)
+	{
+		return NULL;
+	}
+	game->state = LL_GAME_STATE_STOPPED;
+	game->round_step = LL_ROUND_STEP_START;
+	game->motor_speed = 0;
+	game->player = player;
+	game->player_count = player_count;
+	game->round_counter = 0;
+	return game;
 }
