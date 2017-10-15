@@ -38,10 +38,11 @@ enum LL_ANIMATION
     LL_ANIM_GAME_PAUSE = 5,
     LL_ANIM_GAME_EXIT = 6,
     LL_ANIM_PLAYER_LOST = 7,
-    LL_ANIM_PLAYER_LOST_ALONE = 8
+    LL_ANIM_PLAYER_LOST_ALONE = 8,
+	LL_ANIM_ROUND_START = 9
 };
 
-#define LL_ANIM_NUM_ANIMATIONS (9)
+#define LL_ANIM_NUM_ANIMATIONS (10)
 
 void ll_anim_init(render_frame_cb cb);
 void ll_anim_run(uint64_t system_time);
