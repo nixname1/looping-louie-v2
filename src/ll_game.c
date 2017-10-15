@@ -114,6 +114,11 @@ static enum round_result run_round(struct game *game)
 
 	// TODO: run motor here
 
+	if(!ll_switch_is_turned_on())
+	{
+		return ROUND_RESULT_PAUSED;
+	}
+
 	for(uint32_t i = 0; i < game->player_count; i++)
 	{
 		if(game->player[i].chips < 1)
@@ -167,7 +172,7 @@ static enum game_result ll_game_run(struct game *game)
 				    break;
 
 			    case ROUND_RESULT_PAUSED:
-
+				    ret = GAME_RESULT_PAUSED;
 				    break;
 		    }
             break;
@@ -181,15 +186,27 @@ static enum game_result ll_game_run(struct game *game)
             break;
 
 		case LL_ROUND_STEP_WAIT:
+			if(ll_switch_is_turned_on())
+			{
+				game->round_step = LL_ROUND_STEP_START;
+			}
 			break;
     }
 
     return ret;
 }
 
-static void ll_game_pause(struct game *game)
+static uint32_t ll_game_pause(struct game *game)
 {
+	uint32_t ret = 0;
+	// TODO: freeze game state and fade LED's
 	game->state = LL_GAME_STATE_PAUSED;
+
+	if(ll_switch_is_turned_on())
+	{
+		ret = 1;
+	}
+	return ret;
 }
 
 static void ll_game_stop(struct game *game)
@@ -235,9 +252,10 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 			break;
 
 		case LL_SYSTEM_STEP_GAME_PAUSE:
-			// whence game is running and the switch was turned off
-			// TODO: freeze game state and fade LED's
-			actual_system_step = LL_SYSTEM_STEP_GAME_RUN;
+			if(ll_game_pause(game))
+			{
+				actual_system_step = LL_SYSTEM_STEP_GAME_RUN;
+			}
 			break;
 
 		case LL_SYSTEM_STEP_GAME_EXIT:
@@ -249,7 +267,7 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 
 		case LL_SYSTEM_STEP_STANDBY:
 			// TODO: print some standby animation
-			//actual_system_step = LL_SYSTEM_STEP_BOOT;
+			actual_system_step = LL_SYSTEM_STEP_BOOT;
 			break;
 
 		case LL_SYSTEM_STEP_ERROR:
@@ -268,7 +286,7 @@ struct game *ll_game_create(struct player *player, uint32_t player_count)
 		return NULL;
 	}
 	game->state = LL_GAME_STATE_STOPPED;
-	game->round_step = LL_ROUND_STEP_START;
+	game->round_step = LL_ROUND_STEP_WAIT;
 	game->motor_speed = 0;
 	game->player = player;
 	game->player_count = player_count;
