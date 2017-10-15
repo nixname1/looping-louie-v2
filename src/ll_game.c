@@ -180,15 +180,20 @@ static enum game_result ll_game_run(struct game *game)
         case LL_ROUND_STEP_END:
             if(end_round(game))
             {
-                game->round_step = LL_ROUND_STEP_WAIT;
+                game->round_step = LL_ROUND_STEP_WAIT_FOR_START;
 	            game->round_counter++;
             }
             break;
 
-		case LL_ROUND_STEP_WAIT:
+		case LL_ROUND_STEP_WAIT_FOR_START:
+			if(!ll_anim_is_active())
+			{
+				ll_anim_activate(LL_ANIM_ROUND_STANDBY);
+			}
 			if(ll_switch_is_turned_on())
 			{
 				game->round_step = LL_ROUND_STEP_START;
+				ll_anim_stop_animation();
 			}
 			break;
     }
@@ -286,7 +291,7 @@ struct game *ll_game_create(struct player *player, uint32_t player_count)
 		return NULL;
 	}
 	game->state = LL_GAME_STATE_STOPPED;
-	game->round_step = LL_ROUND_STEP_WAIT;
+	game->round_step = LL_ROUND_STEP_WAIT_FOR_START;
 	game->motor_speed = 0;
 	game->player = player;
 	game->player_count = player_count;

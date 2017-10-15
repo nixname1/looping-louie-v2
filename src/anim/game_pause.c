@@ -4,7 +4,7 @@
 #include "ll_led.h"
 #include "ll_anim.h"
 
-#include "anim/round_standby.h"
+#include "anim/game_pause.h"
 
 #define STEP_COUNT (31)
 #define MIN_ALPHA (15)
@@ -114,7 +114,7 @@ static uint32_t finish_animation(struct color *framebuffer, void *payload)
 	return 0;
 }
 
-struct animation *anim_round_standby_init(struct color *framebuffer)
+struct animation *anim_game_pause_init(struct color *framebuffer)
 {
 	struct animation      *anim = malloc(sizeof(*anim));
 	static struct payload p;
