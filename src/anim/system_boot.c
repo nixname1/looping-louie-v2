@@ -57,6 +57,7 @@ uint32_t start_animation(struct color *framebuffer, void *payload)
 	p->zero_counter = 0;
     p->bar_cnt = 0;
     p->ring_cnt = 0;
+	ll_led_clear_all_pixel(framebuffer);
 	set_initial_led_colors(framebuffer, p);
 
 	return 1;
