@@ -35,9 +35,9 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 
 	col = ll_player_get_color(player_number);
 	ll_led_set_pixel(framebuffer, col, LL_LED_NUM_ALL_BARS_CIRCLES + p->led_counter);
-	simulation_renderer_render_frame(framebuffer);
 
-	if(p->led_counter > LL_LED_NUM_BAR_CIRCLE_PER_PLAYER * player_number)
+	*col = WHITE;
+	if(p->led_counter % (uint32_t)LL_LED_NUM_STRIPE_PER_PLAYER != 0)
 	{
 		cnt++;
 	}
@@ -47,16 +47,22 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 		ring_cnt = 0;
 	}
 
-	if(cnt >= 6)
+	if (cnt > 5 && cnt < 11)
 	{
-		ll_led_set_pixel_for_player(framebuffer, col, LL_LED_NUM_PER_BAR + ring_cnt, player_number);
-		simulation_renderer_render_frame(framebuffer);
-		ll_led_set_pixel_for_player(framebuffer, col, LL_LED_NUM_PER_BAR + LL_LED_NUM_PER_CIRCLE - 1 - ring_cnt, player_number);
-		simulation_renderer_render_frame(framebuffer);
+		if (ring_cnt == 0)
+		{
+			ll_led_set_pixel_for_player(framebuffer, col, LL_LED_NUM_PER_BAR + 0, player_number);
+		}
+		else if (ring_cnt == 4)
+		{
+			ll_led_set_pixel_for_player(framebuffer, col, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE / 2), player_number);
+		}
 		ring_cnt++;
+		ll_led_set_pixel_for_player(framebuffer, col, LL_LED_NUM_PER_BAR + ring_cnt, player_number);
+		ll_led_set_pixel_for_player(framebuffer, col, LL_LED_NUM_BAR_CIRCLE_PER_PLAYER - ring_cnt, player_number);
 	}
 	p->led_counter++;
-    return 0;
+	return 0;
 }
 
 static uint32_t finish_animation(struct color *framebuffer, void *payload)
