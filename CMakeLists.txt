@@ -69,7 +69,7 @@ set(SOURCE_FILES
     src/ll_switch.c
     src/anim/system_boot.c
     src/anim/game_start.c
-    src/anim/round_standby.c
+        src/anim/game_pause.c
     src/hardware/ll_gpio.c
     src/hardware/ll_74hc166.c
     src/hardware/ll_renderer.c
