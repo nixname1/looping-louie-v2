@@ -230,7 +230,7 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 	{
 		case LL_SYSTEM_STEP_BOOT:
 			if(run_system_boot(systime))
-				actual_system_step = LL_SYSTEM_STEP_GAME_START;
+				actual_system_step = LL_SYSTEM_STEP_STANDBY;
 			break;
 
 		case LL_SYSTEM_STEP_GAME_START:
@@ -271,8 +271,10 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 			break;
 
 		case LL_SYSTEM_STEP_STANDBY:
-			// TODO: print some standby animation
-			actual_system_step = LL_SYSTEM_STEP_BOOT;
+			if(ll_switch_is_turned_on())
+            {
+                actual_system_step = LL_SYSTEM_STEP_GAME_START;
+            }
 			break;
 
 		case LL_SYSTEM_STEP_ERROR:
