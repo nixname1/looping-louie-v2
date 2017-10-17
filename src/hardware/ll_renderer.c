@@ -1,20 +1,24 @@
 #include <stdlib.h>
+#include <cmsis/stm32f411xe.h>
 
 #include "stm32f4xx.h"
 #include "hardware/ll_system.h"
 #include "ll_led.h"
 #include "hardware/ll_renderer.h"
 
-static void ll_renderer_render_pixel(struct color *col);
+static void ll_renderer_render_pixel(struct color *col, volatile uint32_t* reg_addr, uint32_t set_value, uint32_t reset_val);
 
 /**
  * @brief   initializes the LED system
  */
 void ll_renderer_init()
 {
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+	RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN & RCC_AHB1ENR_GPIOBEN);
 	GPIOA->MODER |= GPIO_MODER_MODER7_0;
 	GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR7; // highest speed
+
+	GPIOB->MODER |= GPIO_MODER_MODER5_0;
+	GPIOB->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR5;
 }
 
 /**
@@ -24,10 +28,13 @@ void ll_renderer_init()
 void ll_renderer_render_frame(struct color *framebuffer)
 {
 	uint32_t i = 0;
-	while(i < LL_LED_NUM_LEDS)
+	for(i = 0; i < LL_LED_NUM_ALL_BARS_CIRCLES; i++)
 	{
-		ll_renderer_render_pixel(&framebuffer[i]);
-		i++;
+		ll_renderer_render_pixel(&framebuffer[i], &GPIOA->BSRR, GPIO_BSRR_BS_7, GPIO_BSRR_BR_7);
+	}
+	for( ; i < LL_LED_NUM_LEDS; i++)
+	{
+		ll_renderer_render_pixel(&framebuffer[i], &GPIOB->BSRR, GPIO_BSRR_BS_5, GPIO_BSRR_BR_5);
 	}
 	delay_ms(1);
 }
@@ -37,7 +44,7 @@ void ll_renderer_render_frame(struct color *framebuffer)
  * @brief   Format: GRB highest byte first
  * @param   color   the color
  */
-static void ll_renderer_render_pixel(struct color *col)
+static void ll_renderer_render_pixel(struct color *col, volatile uint32_t* reg_addr, uint32_t set_value, uint32_t reset_val)
 {
 	uint32_t seq[3] = { col->g, col->r, col->b };
 	uint32_t act_seq = 0;
@@ -56,7 +63,7 @@ static void ll_renderer_render_pixel(struct color *col)
 			if(act_bit)
 			{
 				// send a logical one
-				GPIOA->BSRR = GPIO_BSRR_BS_7;
+				*reg_addr = set_value;
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
@@ -65,7 +72,7 @@ static void ll_renderer_render_pixel(struct color *col)
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
-				GPIOA->BSRR = GPIO_BSRR_BR_7;
+				*reg_addr = reset_val;
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
@@ -76,13 +83,13 @@ static void ll_renderer_render_pixel(struct color *col)
 			else
 			{
 				// send a logical zero
-				GPIOA->BSRR = GPIO_BSRR_BS_7;
+				*reg_addr = set_value;
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
-				GPIOA->BSRR = GPIO_BSRR_BR_7;
+				*reg_addr = reset_val;
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
 				asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);asm volatile("nop"::);
