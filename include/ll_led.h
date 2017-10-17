@@ -14,11 +14,11 @@
 #define LL_LED_NUM_LEDS ((LL_LED_NUM_PER_PLAYER * LL_PLAYER_NUM_PLAYERS) + LL_LED_NUM_STRIPE)
 
 #define RED     ((struct color) {255, 0, 0, 255})
-#define GREEN   ((struct color) {0, 255, 0, 255})
+#define GREEN   ((struct color) {0, 255, 0, 128})
 #define BLUE    ((struct color) {0, 0, 255, 255})
-#define YELLOW  ((struct color) {255, 100, 0, 255})
-#define PURPLE  ((struct color) {255, 0, 127, 255})
-#define WHITE   ((struct color) {255, 255, 255, 255})
+#define YELLOW  ((struct color) {255, 100, 0, 200})
+#define PURPLE  ((struct color) {255, 0, 127, 178})
+#define WHITE   ((struct color) {255, 255, 255, 128})
 #define BLACK   ((struct color) {0, 0, 0, 0})
 
 struct color
