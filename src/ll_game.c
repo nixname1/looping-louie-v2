@@ -203,13 +203,21 @@ static enum game_result ll_game_run(struct game *game)
 
 static uint32_t ll_game_pause(struct game *game)
 {
+	static uint32_t is_new_pause = 1;
 	uint32_t ret = 0;
-	// TODO: freeze game state and fade LED's
+
 	game->state = LL_GAME_STATE_PAUSED;
+	if(is_new_pause)
+	{
+        ll_anim_activate(LL_ANIM_GAME_PAUSE);
+		is_new_pause = 0;
+	}
 
 	if(ll_switch_is_turned_on())
 	{
+		is_new_pause = 1;
 		ret = 1;
+		ll_anim_stop_animation();
 	}
 	return ret;
 }

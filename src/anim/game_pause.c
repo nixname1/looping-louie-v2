@@ -6,8 +6,8 @@
 
 #include "anim/game_pause.h"
 
-#define STEP_COUNT (31)
-#define MIN_ALPHA (15)
+#define STEP_COUNT (62)
+#define MIN_ALPHA (50)
 
 enum step
 {
@@ -23,6 +23,7 @@ struct payload
 	uint8_t brightness_reference;
 	uint8_t brightest_value;
 	enum step step;
+    uint8_t padd1;
 };
 
 static uint32_t start_animation(struct color *framebuffer, void *payload)
@@ -50,29 +51,20 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 {
 	static uint32_t wait_counter = 0;
 	struct payload *p = payload;
-	static uint32_t my_rand_value = 1;
 
 	wait_counter++;
-	if(wait_counter < 3)
+	//if(wait_counter < 2)
 	{
-		return 1;
+	//	return 1;
 	}
 	wait_counter = 0;
 	if(p->brightness_reference <= MIN_ALPHA)
 	{
 		p->step = STEP_UP;
-		if(my_rand_value < 100)
-		{
-			my_rand_value += 100;
-		}
 	}
 	else if(p->brightness_reference >= p->brightest_value)
 	{
 		p->step = STEP_DOWN;
-		if(my_rand_value < 100)
-		{
-			my_rand_value += 100;
-		}
 	}
 	switch(p->step)
 	{

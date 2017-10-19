@@ -4,7 +4,6 @@
 #include "ll_led.h"
 #include "ll_anim.h"
 #include "anim/game_start.h"
-#include "../../../simulation_renderer.h"
 
 struct payload
 {
@@ -27,6 +26,7 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 	struct payload *p = payload;
 	struct color *col;
 	uint32_t player_number = (p->led_counter) / (LL_LED_NUM_STRIPE_PER_PLAYER);
+    uint32_t led_index;
 
 	if(p->led_counter >= LL_LED_NUM_STRIPE)
 	{
@@ -47,19 +47,19 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 		ring_cnt = 0;
 	}
 
-	if (cnt > 5 && cnt < 11)
+	if (cnt > 5 && cnt < 12)
 	{
-		if (ring_cnt == 0)
-		{
-			ll_led_set_pixel_for_player(framebuffer, col, LL_LED_NUM_PER_BAR + 0, player_number);
-		}
-		else if (ring_cnt == 4)
-		{
-			ll_led_set_pixel_for_player(framebuffer, col, LL_LED_NUM_PER_BAR + (LL_LED_NUM_PER_CIRCLE / 2), player_number);
-		}
-		ring_cnt++;
-		ll_led_set_pixel_for_player(framebuffer, col, LL_LED_NUM_PER_BAR + ring_cnt, player_number);
-		ll_led_set_pixel_for_player(framebuffer, col, LL_LED_NUM_BAR_CIRCLE_PER_PLAYER - ring_cnt, player_number);
+        uint32_t offset_up = LL_LED_NUM_PER_BAR + 2;
+        uint32_t offset_down = LL_LED_NUM_BAR_CIRCLE_PER_PLAYER - (LL_LED_NUM_PER_CIRCLE - 1);
+		ll_led_set_pixel_for_player(framebuffer, col, offset_up + ring_cnt, player_number);
+
+        led_index = offset_down - ring_cnt;
+        if(led_index < LL_LED_NUM_PER_BAR)
+        {
+            led_index += LL_LED_NUM_PER_CIRCLE;
+        }
+		ll_led_set_pixel_for_player(framebuffer, col, led_index, player_number);
+        ring_cnt++;
 	}
 	p->led_counter++;
 	return 0;
