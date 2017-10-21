@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
     ll_anim_add(LL_ANIM_SYSTEM_BOOT, anim_system_boot_init(framebuffer));
     ll_anim_add(LL_ANIM_GAME_START, anim_game_start_init(framebuffer));
     ll_anim_add(LL_ANIM_GAME_PAUSE, anim_game_pause_init(framebuffer));
+    ll_anim_add(LL_ANIM_ROUND_STANDBY, anim_game_start_init(framebuffer));
 
     ll_lb_init(ll_74hc166_read_data, ll_game_lb_event_callback);
 

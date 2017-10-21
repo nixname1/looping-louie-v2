@@ -100,6 +100,11 @@ static uint32_t start_new_round(struct game *game)
 		return 1;
 	}
 
+    for(uint32_t i = 0; i < game->player_count; i++)
+    {
+        game->player[i].chips = 3;
+    }
+
 	// TODO: activate whence LL_ANIM_ROUND_START is implemented
 	//ll_anim_activate(LL_ANIM_ROUND_START);
 	//ll_anim_stop_animation();
@@ -126,7 +131,9 @@ static enum round_result run_round(struct game *game)
 	{
 		if(game->player[i].chips < 1)
 		{
+            game->player[i].lost_count++;
 			ll_anim_stop_animation();
+            ll_anim_activate(LL_ANIM_PLAYER_LOST);
 			return ROUND_RESULT_PLAYER_LOST;
 		}
 	}
@@ -176,7 +183,6 @@ static enum game_result ll_game_run(struct game *game)
 				    break;
 
 			    case ROUND_RESULT_PLAYER_LOST:
-					ll_anim_activate(LL_ANIM_PLAYER_LOST);
 					game->round_step = LL_ROUND_STEP_END;
 				    break;
 
@@ -197,12 +203,12 @@ static enum game_result ll_game_run(struct game *game)
 		case LL_ROUND_STEP_WAIT_FOR_START:
 			if(!ll_anim_is_active())
 			{
-				//ll_anim_activate(LL_ANIM_ROUND_STANDBY);
+				ll_anim_activate(LL_ANIM_ROUND_STANDBY);
 			}
 			if(ll_switch_is_turned_on())
 			{
-				game->round_step = LL_ROUND_STEP_START;
-				ll_anim_stop_animation();
+                ll_anim_stop_animation();
+                game->round_step = LL_ROUND_STEP_START;
 			}
 			break;
     }

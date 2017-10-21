@@ -1,8 +1,6 @@
-//
-// Created by simon on 21.10.17.
-//
+#ifndef ROUND_STANDBY_H
+#define ROUND_STANDBY_H
 
-#ifndef LLV2_LED_SIMULATION_ROUND_STANDBY_H
-#define LLV2_LED_SIMULATION_ROUND_STANDBY_H
+struct animation *anim_round_standby_init(struct color *framebuffer, struct game *game);
 
-#endif //LLV2_LED_SIMULATION_ROUND_STANDBY_H
+#endif

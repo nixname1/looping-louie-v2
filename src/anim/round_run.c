@@ -42,6 +42,11 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
                 col = BLACK;
         }
         ll_led_set_circle_color_for_player(framebuffer, &col, i);
+
+        for(uint32_t j = 0; j < p->game->player[i].lost_count; j++)
+        {
+            ll_led_set_pixel_for_player(framebuffer, &RED, j, i);
+        }
     }
 
 

@@ -10,17 +10,18 @@
 #define LONG_WAIT (90)
 #define SHORT_WAIT (30)
 
+enum step
+{
+    STEP_FADE,
+    STEP_BLINK
+};
+
 struct payload
 {
     struct game *game;
     uint32_t player_lost;
     uint32_t zero_counter;
-};
-
-enum step
-{
-    STEP_FADE,
-    STEP_BLINK
+    enum step run_step;
 };
 
 static void fade_leds(struct color *framebuffer, struct payload *p)
@@ -33,7 +34,7 @@ static void fade_leds(struct color *framebuffer, struct payload *p)
         if(p->player_lost == (i / LL_LED_NUM_PER_PLAYER))
         {
 
-            if ((i % LL_LED_NUM_PER_PLAYER) == p->game->player[p->player_lost].lost_count)
+            if ((i % LL_LED_NUM_PER_PLAYER) == p->game->player[p->player_lost].lost_count - 1)
             {
                 ll_led_set_pixel(framebuffer, &RED, i);
                 continue;
@@ -79,7 +80,7 @@ static void player_switch(struct color *framebuffer, struct payload *p, uint32_t
         alpha = 0;
     }
 
-    ll_led_set_alpha_for_player_pixel(framebuffer, alpha, p->game->player[p->player_lost].lost_count, p->player_lost);
+    ll_led_set_alpha_for_player_pixel(framebuffer, alpha, p->game->player[p->player_lost].lost_count - 1, p->player_lost);
     for(uint32_t i = 0; i < LL_LED_NUM_PER_CIRCLE; i++)
     {
         ll_led_set_alpha_for_player_pixel(framebuffer, alpha, LL_LED_NUM_PER_BAR + i, p->player_lost);
@@ -105,7 +106,9 @@ static uint32_t start_animation(struct color *framebuffer, void *payload)
         }
     }
 
-    ll_led_set_pixel_for_player(framebuffer, &RED, p->game->player[p->player_lost].lost_count, p->player_lost);
+    p->run_step = STEP_FADE;
+
+    ll_led_set_pixel_for_player(framebuffer, &RED, p->game->player[p->player_lost].lost_count - 1, p->player_lost);
 
     p->zero_counter = 0;
     for(i = 0; i < LL_LED_NUM_LEDS; i++)
@@ -127,14 +130,14 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
     static uint32_t wait_tm = LONG_WAIT;
     struct payload *p = payload;
 
-    switch(s)
+    switch(p->run_step)
     {
         case STEP_FADE:
             fade_leds(framebuffer, p);
             if (p->zero_counter >= (LL_LED_NUM_LEDS - LL_LED_NUM_PER_PLAYER - LL_LED_NUM_STRIPE_PER_PLAYER))
             {
                 blink_state = 1;
-                s = STEP_BLINK;
+                p->run_step = STEP_BLINK;
             }
             break;
 
@@ -142,7 +145,7 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
             if(wait_tm)
             {
                 wait_tm--;
-                return blink_state;
+                return (blink_state) ? 0: 1;
             }
             switch(blink_step)
             {
