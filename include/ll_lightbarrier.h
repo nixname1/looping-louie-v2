@@ -24,7 +24,7 @@
 
 
 /** get the status of external devices every X ms*/
-#define LL_LB_POLL_TIME    (10)
+#define LL_LB_POLL_TIME    (50)
 
 /** number of devices connected to all 74hc166 */
 #define LL_LB_COUNT     (LL_PLAYER_NUM_PLAYERS)

@@ -27,6 +27,8 @@ void ll_lb_run(uint64_t systime, void *payload)
         return;
     }
 
+    last_update_time = systime;
+
     if(!update_callback || !event_callback)
     {
         return;
