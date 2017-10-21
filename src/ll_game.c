@@ -47,17 +47,17 @@ void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrie
 	if(event == LL_EXT_EVENT_START)
 	{
 		event_start_time = event_time;
+        if(game->state == LL_GAME_STATE_RUNNING && game->round_step == LL_ROUND_STEP_RUN)
+        {
+            if (game->player[lightbarrier].chips > 0)
+            {
+                game->player[lightbarrier].chips--;
+            }
+        }
 	}
 	else if(event == LL_EXT_EVENT_END)
 	{
 		event_end_time = event_time;
-		if(game->state == LL_GAME_STATE_RUNNING && game->round_step == LL_ROUND_STEP_RUN)
-		{
-			if (game->player[lightbarrier].chips > 0)
-			{
-				game->player[lightbarrier].chips--;
-			}
-		}
 	}
 }
 
