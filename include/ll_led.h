@@ -34,6 +34,7 @@ void ll_led_shift_all_left(struct color *framebuffer);
 void ll_led_shift_all_right(struct color *framebuffer);
 void ll_led_shift_player_circle_right(struct color *framebuffer, uint32_t player);
 void ll_led_shift_player_bar_down(struct color *framebuffer, uint32_t player);
+void ll_led_set_circle_color_for_player(struct color *framebuffer, struct color *col, uint32_t player);
 void ll_led_set_pixel_for_player(struct color *framebuffer, struct color *new_pixel, uint32_t pixel_number, uint32_t player);
 void ll_led_set_pixel(struct color *framebuffer, struct color *color, uint32_t led);
 void ll_led_set_alpha_for_player_pixel(struct color *framebuffer, uint8_t alpha, uint32_t pixel_number, uint32_t player);

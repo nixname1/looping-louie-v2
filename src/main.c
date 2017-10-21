@@ -21,6 +21,8 @@
 #include "anim/system_boot.h"
 #include "anim/game_start.h"
 #include "anim/game_pause.h"
+#include "anim/round_run.h"
+#include "anim/player_lost.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
@@ -70,6 +72,9 @@ int main(int argc, char *argv[])
         player[i].lost_count = 0;
     }
 	game = ll_game_create(player, LL_PLAYER_NUM_PLAYERS);
+
+    ll_anim_add(LL_ANIM_PLAYER_LOST, anim_player_lost_init(framebuffer, game));
+    ll_anim_add(LL_ANIM_ROUND_RUN, anim_round_run_init(framebuffer, game));
     while (1)
     {
 	    ll_game_loop_run(game,ll_system_get_systime());

@@ -83,6 +83,14 @@ void ll_led_shift_player_bar_down(struct color *framebuffer, uint32_t player)
 	framebuffer[offset + i] = tmp;
 }
 
+void ll_led_set_circle_color_for_player(struct color *framebuffer, struct color *col, uint32_t player)
+{
+    for(uint32_t i = 0; i < LL_LED_NUM_PER_CIRCLE; i++)
+    {
+        memcpy(&framebuffer[player * LL_LED_NUM_PER_PLAYER + LL_LED_NUM_PER_BAR + i], col, sizeof(*framebuffer));
+    }
+}
+
 /**
  * @brief set all leds for a player
  * @param   new_pixel   the colors; for every led one
