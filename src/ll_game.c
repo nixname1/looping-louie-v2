@@ -132,6 +132,7 @@ static enum round_result run_round(struct game *game)
 		if(game->player[i].chips < 1)
 		{
             game->player[i].lost_count++;
+			game->player_lost = &game->player[i];
 			ll_anim_stop_animation();
             ll_anim_activate(LL_ANIM_PLAYER_LOST);
 			return ROUND_RESULT_PLAYER_LOST;
@@ -207,7 +208,9 @@ static enum game_result ll_game_run(struct game *game)
 			}
 			if(ll_switch_is_turned_on())
 			{
-                ll_anim_stop_animation();
+                //ll_anim_stop_animation();
+				ll_anim_activate(LL_ANIM_GAME_START);
+				ll_anim_stop_animation();
                 game->round_step = LL_ROUND_STEP_START;
 			}
 			break;

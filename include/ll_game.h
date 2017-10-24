@@ -27,6 +27,7 @@ struct game
 	uint32_t motor_speed;
 	struct color *framebuffer;
 	struct player *player;
+	struct player *player_lost;
 	uint32_t player_count;
 	enum ll_game_state state;
 	enum game_round_step round_step;
