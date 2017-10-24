@@ -5,10 +5,35 @@
 #include "ll_player.h"
 #include "ll_led.h"
 
-
+struct stripe_pos
+{
+	uint32_t start;
+	uint32_t end;
+};
+static struct stripe_pos stripe_positions[LL_PLAYER_NUM_PLAYERS] =
+		                        {
+				                        {0, 14},
+				                        {15, 28},
+				                        {29, 43},
+				                        {44, 57},
+				                        {58, 72},
+				                        {73, 86},
+				                        {87, 101},
+				                        {102, 115}
+		                        };
 struct color * ll_led_create_framebuffer()
 {
     return calloc(sizeof(struct color), LL_LED_NUM_LEDS);
+}
+
+uint32_t ll_led_stripe_get_start_pos(uint32_t player)
+{
+	return stripe_positions[player].start;
+}
+
+uint32_t ll_led_stripe_get_end_pos(uint32_t player)
+{
+	return stripe_positions[player].end;
 }
 
 /**
@@ -147,4 +172,28 @@ void ll_led_clear_pixel(struct color *framebuffer, uint32_t pixel_number)
 void ll_led_clear_all_pixel(struct color *framebuffer)
 {
     memset(framebuffer, 0, sizeof(*framebuffer) * LL_LED_NUM_LEDS);
+}
+
+/**
+ * @brief sets a sepcific pixel on the stripe
+ * @param framebuffer
+ * @param new_pixel
+ */
+void ll_led_stripe_set_pixel(struct color *framebuffer, struct color *new_pixel, uint32_t pos)
+{
+	framebuffer[LL_LED_NUM_ALL_BARS_CIRCLES + pos] = *new_pixel;
+}
+
+void ll_led_stripe_set_pixel_for_player(struct color *framebuffer, struct color *new_pixel, uint32_t pos, uint32_t player)
+{
+	framebuffer[LL_LED_NUM_ALL_BARS_CIRCLES + ll_led_stripe_get_start_pos(player) + pos] = *new_pixel;
+}
+
+void ll_led_stripe_set_complete_player(struct color *framebuffer, struct color *col, uint32_t player)
+{
+	uint32_t len = ll_led_stripe_get_end_pos(player) - ll_led_stripe_get_start_pos(player);
+	for(uint32_t i = 0; i <= len; i++)
+	{
+		ll_led_stripe_set_pixel_for_player(framebuffer, col, i, player);
+	}
 }
