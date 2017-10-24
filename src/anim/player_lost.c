@@ -151,21 +151,25 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
             {
                 case 1:
                     player_switch(framebuffer, p, 0);
+                    blink_state = 0;
                     wait_tm = SHORT_WAIT;
                     break;
 
                 case 2:
                     player_switch(framebuffer, p, 1);
+                    blink_state = 1;
                     wait_tm = SHORT_WAIT;
                     break;
 
                 case 3:
                     player_switch(framebuffer, p, 0);
+                    blink_state = 0;
                     wait_tm = SHORT_WAIT;
                     break;
 
                 case 4:
                     player_switch(framebuffer, p, 1);
+                    blink_state = 1;
                     wait_tm = LONG_WAIT;
                     blink_step = 0;
                     break;
