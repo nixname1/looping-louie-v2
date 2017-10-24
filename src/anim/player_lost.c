@@ -7,11 +7,12 @@
 #include "ll_game.h"
 #include "anim/player_lost.h"
 
-#define LONG_WAIT (90)
-#define SHORT_WAIT (30)
+#define LONG_WAIT (60)
+#define SHORT_WAIT (15)
 
 enum step
 {
+	STEP_SET_LOST_COLOR,
     STEP_FADE,
     STEP_BLINK
 };
@@ -33,24 +34,10 @@ static void fade_leds(struct color *framebuffer, struct payload *p)
     {
         if(p->player_lost == (i / LL_LED_NUM_PER_PLAYER))
         {
-
-            if ((i % LL_LED_NUM_PER_PLAYER) == p->game->player[p->player_lost].lost_count - 1)
-            {
-                ll_led_set_pixel(framebuffer, &RED, i);
-                continue;
-            }
-            else if(i % LL_LED_NUM_PER_PLAYER >= LL_LED_NUM_PER_BAR)
-            {
-                ll_led_set_pixel(framebuffer, &RED, i);
-            }
-            else
-            {
-                continue;
-            }
+            continue;
         }
-        else if(p->player_lost == (uint32_t) ((i - LL_LED_NUM_ALL_BARS_CIRCLES) / LL_LED_NUM_STRIPE_PER_PLAYER))
+        else if(p->player_lost == (uint32_t) ((i - LL_LED_NUM_ALL_BARS_CIRCLES) / (uint32_t) LL_LED_NUM_STRIPE_PER_PLAYER))
         {
-            ll_led_set_pixel(framebuffer, &RED, i);
             continue;
         }
 
@@ -106,9 +93,7 @@ static uint32_t start_animation(struct color *framebuffer, void *payload)
         }
     }
 
-    p->run_step = STEP_FADE;
-
-    ll_led_set_pixel_for_player(framebuffer, &RED, p->game->player[p->player_lost].lost_count - 1, p->player_lost);
+    p->run_step = STEP_SET_LOST_COLOR;
 
     p->zero_counter = 0;
     for(i = 0; i < LL_LED_NUM_LEDS; i++)
@@ -124,14 +109,21 @@ static uint32_t start_animation(struct color *framebuffer, void *payload)
 
 static uint32_t run_animation(struct color *framebuffer, void *payload)
 {
-    static enum step s = STEP_FADE;
     static uint32_t blink_state = 0;
     static uint32_t blink_step = 1;
     static uint32_t wait_tm = LONG_WAIT;
     struct payload *p = payload;
 
+	uint32_t i;
+
     switch(p->run_step)
     {
+	    case STEP_SET_LOST_COLOR:
+		    ll_led_set_pixel_for_player(framebuffer, &RED, p->game->player[p->player_lost].lost_count - 1, p->player_lost);
+		    ll_led_set_circle_color_for_player(framebuffer, &RED, p->player_lost);
+		    ll_led_stripe_set_complete_player(framebuffer, &RED, p->player_lost);
+		    p->run_step = STEP_FADE;
+		    break;
         case STEP_FADE:
             fade_leds(framebuffer, p);
             if (p->zero_counter >= (LL_LED_NUM_LEDS - LL_LED_NUM_PER_PLAYER - LL_LED_NUM_STRIPE_PER_PLAYER))
@@ -168,6 +160,18 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
                     break;
 
                 case 4:
+                    player_switch(framebuffer, p, 1);
+                    blink_state = 1;
+                    wait_tm = SHORT_WAIT;
+		            break;
+
+	            case 5:
+                    player_switch(framebuffer, p, 0);
+                    blink_state = 0;
+                    wait_tm = SHORT_WAIT;
+                    break;
+
+                case 6:
                     player_switch(framebuffer, p, 1);
                     blink_state = 1;
                     wait_tm = LONG_WAIT;
