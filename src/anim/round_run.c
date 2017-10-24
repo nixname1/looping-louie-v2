@@ -45,7 +45,7 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 
         for(uint32_t j = 0; j < p->game->player[i].lost_count; j++)
         {
-            ll_led_set_pixel_for_player(framebuffer, &RED, j, i);
+			ll_led_set_pixel_for_player(framebuffer, ll_player_get_color(i), j, i);
         }
     }
 
