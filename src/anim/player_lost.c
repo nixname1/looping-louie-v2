@@ -27,33 +27,16 @@ struct payload
 static void fade_leds(struct color *framebuffer, struct payload *p)
 {
     uint32_t i;
-    struct color *c;
 
-    for (i = 0; i < LL_LED_NUM_LEDS; i++)
+    p->zero_counter = 0;
+    for (i = 0; i < p->game->player_count; i++)
     {
-        if(
-                i >= ll_led_stripe_get_absolute_start_pos(p->player_lost) &&
-                i <= ll_led_stripe_get_absolute_end_pos(p->player_lost))
-        {
-            continue;
-        }
-        else if(
-                i >= LL_LED_NUM_PER_PLAYER * p->player_lost &&
-                i <= LL_LED_NUM_PER_PLAYER * p->player_lost + LL_LED_NUM_PER_PLAYER )
+        if(i == p->player_lost)
         {
             continue;
         }
 
-        c = &framebuffer[i];
-        c->a *= 0.85;
-        if (c->a < 3 && c->a > 0)
-        {
-            p->zero_counter++;
-            framebuffer[i].a = 0;
-        } else
-        {
-            ll_led_set_pixel(framebuffer, c, i);
-        }
+        p->zero_counter += ll_led_fade_leds_for_player_with_stripe(framebuffer, i, LL_LED_FADE_DIR_OUT, 15, 3);
     }
 }
 
@@ -106,15 +89,6 @@ static uint32_t start_animation(struct color *framebuffer, void *payload)
     set_initial_led_colors(framebuffer, p);
 
     p->run_step = STEP_FADE;
-    p->zero_counter = 0;
-    for(i = 0; i < LL_LED_NUM_LEDS; i++)
-    {
-        if(framebuffer[i].a < 3)
-        {
-            p->zero_counter++;
-        }
-    }
-
     return 1;
 }
 
@@ -129,7 +103,7 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
     {
         case STEP_FADE:
             fade_leds(framebuffer, p);
-            if (p->zero_counter >= (LL_LED_NUM_LEDS - LL_LED_NUM_PER_PLAYER - LL_LED_NUM_STRIPE_PER_PLAYER))
+            if (p->zero_counter >= LL_LED_NUM_LEDS - (ll_led_stripe_get_size_for_player(p->player_lost) + LL_LED_NUM_PER_PLAYER))
             {
                 blink_state = 1;
                 p->run_step = STEP_BLINK;

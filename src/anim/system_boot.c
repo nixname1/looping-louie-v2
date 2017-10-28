@@ -42,6 +42,8 @@ static void set_initial_led_colors(struct color *framebuffer, struct payload *p)
 			c->a = factor * (j + (uint8_t) 1);
 			ll_led_set_pixel_for_player(framebuffer, c, j, i);
 		}
+
+		ll_led_stripe_set_complete_player(framebuffer, &BLACK, i);
 	}
 }
 
@@ -103,30 +105,20 @@ uint32_t run_animation(struct color *framebuffer, void *payload)
  */
 uint32_t finish_animation(struct color *framebuffer, void *payload)
 {
-	uint32_t i;
 	uint32_t ret = 0;
-
+	uint32_t i;
 	struct payload *p = payload;
 
 	// and add fading out
-	for (i = 0; i < LL_LED_NUM_LEDS; i++)
+	p->zero_counter = 0;
+	for(i = 0; i < LL_PLAYER_NUM_PLAYERS; i++)
 	{
-		struct color *c = &framebuffer[i];
-		c->a *= 0.9;
-		if (c->a < 3 && c->a > 0)
-		{
-			p->zero_counter++;
-			ll_led_clear_pixel(framebuffer, i);
-		} else
-		{
-			ll_led_set_pixel(framebuffer, c, i);
-		}
-		if (p->zero_counter >= 160)
-		{
-			ret = 1;
-		}
+		p->zero_counter += ll_led_fade_leds_for_player(framebuffer, i, LL_LED_FADE_DIR_OUT, 5, 3);
 	}
-
+	if(p->zero_counter >= LL_LED_NUM_ALL_BARS_CIRCLES)
+	{
+		return 1;
+	}
 	// keep the animation running
 	run_animation(framebuffer, payload);
 
