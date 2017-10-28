@@ -72,6 +72,7 @@ set(SOURCE_FILES
     src/anim/game_pause.c
     src/anim/player_lost.c
     src/anim/round_run.c
+    src/anim/round_standby.c
     src/hardware/ll_gpio.c
     src/hardware/ll_74hc166.c
     src/hardware/ll_renderer.c

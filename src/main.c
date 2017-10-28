@@ -22,6 +22,7 @@
 #include "anim/game_start.h"
 #include "anim/game_pause.h"
 #include "anim/round_run.h"
+#include "anim/round_standby.h"
 #include "anim/player_lost.h"
 
 #pragma GCC diagnostic push
@@ -60,7 +61,6 @@ int main(int argc, char *argv[])
     ll_anim_add(LL_ANIM_SYSTEM_BOOT, anim_system_boot_init(framebuffer));
     ll_anim_add(LL_ANIM_GAME_START, anim_game_start_init(framebuffer));
     ll_anim_add(LL_ANIM_GAME_PAUSE, anim_game_pause_init(framebuffer));
-    ll_anim_add(LL_ANIM_ROUND_STANDBY, anim_game_start_init(framebuffer));
 
     ll_lb_init(ll_74hc166_read_data, ll_game_lb_event_callback);
 
@@ -76,6 +76,8 @@ int main(int argc, char *argv[])
 
     ll_anim_add(LL_ANIM_PLAYER_LOST, anim_player_lost_init(framebuffer, game));
     ll_anim_add(LL_ANIM_ROUND_RUN, anim_round_run_init(framebuffer, game));
+    ll_anim_add(LL_ANIM_ROUND_STANDBY, anim_round_standby_init(framebuffer, game));
+
     while (1)
     {
 	    ll_game_loop_run(game,ll_system_get_systime());
