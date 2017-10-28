@@ -13,7 +13,7 @@ static void ll_renderer_render_pixel(struct color *col, volatile uint32_t* reg_a
  */
 void ll_renderer_init()
 {
-	RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN & RCC_AHB1ENR_GPIOBEN);
+	RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN);
 	GPIOA->MODER |= GPIO_MODER_MODER7_0;
 	GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR7; // highest speed
 
