@@ -36,6 +36,21 @@ uint32_t ll_led_stripe_get_end_pos(uint32_t player)
 	return stripe_positions[player].end;
 }
 
+uint32_t ll_led_stripe_get_absolute_start_pos(uint32_t player)
+{
+    return LL_LED_NUM_ALL_BARS_CIRCLES + ll_led_stripe_get_start_pos(player);
+}
+
+uint32_t ll_led_stripe_get_absolute_end_pos(uint32_t player)
+{
+    return LL_LED_NUM_ALL_BARS_CIRCLES + ll_led_stripe_get_end_pos(player);
+}
+
+uint32_t ll_led_stripe_get_size_for_player(uint32_t player)
+{
+	return (ll_led_stripe_get_end_pos(player) - ll_led_stripe_get_start_pos(player)) + 1;
+}
+
 /**
  * @brief shifts all colors to the left side
  */
@@ -174,6 +189,11 @@ void ll_led_clear_all_pixel(struct color *framebuffer)
     memset(framebuffer, 0, sizeof(*framebuffer) * LL_LED_NUM_LEDS);
 }
 
+void ll_led_clear_all_pixel_of_player(struct color *framebuffer, uint32_t player)
+{
+    memset(&framebuffer[LL_LED_NUM_PER_PLAYER * player], 0, sizeof(*framebuffer) * LL_LED_NUM_PER_PLAYER);
+}
+
 /**
  * @brief sets a sepcific pixel on the stripe
  * @param framebuffer
@@ -196,4 +216,9 @@ void ll_led_stripe_set_complete_player(struct color *framebuffer, struct color *
 	{
 		ll_led_stripe_set_pixel_for_player(framebuffer, col, i, player);
 	}
+}
+
+void ll_led_stripe_set_alpha_for_player_pixel(struct color *framebuffer, uint32_t pos, uint8_t alpha, uint32_t player)
+{
+	framebuffer[LL_LED_NUM_ALL_BARS_CIRCLES + ll_led_stripe_get_start_pos(player) + pos].a = alpha;
 }

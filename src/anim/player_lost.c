@@ -12,7 +12,6 @@
 
 enum step
 {
-	STEP_SET_LOST_COLOR,
     STEP_FADE,
     STEP_BLINK
 };
@@ -32,11 +31,15 @@ static void fade_leds(struct color *framebuffer, struct payload *p)
 
     for (i = 0; i < LL_LED_NUM_LEDS; i++)
     {
-        if(p->player_lost == (i / LL_LED_NUM_PER_PLAYER))
+        if(
+                i >= ll_led_stripe_get_absolute_start_pos(p->player_lost) &&
+                i <= ll_led_stripe_get_absolute_end_pos(p->player_lost))
         {
             continue;
         }
-        else if(p->player_lost == (uint32_t) ((i - LL_LED_NUM_ALL_BARS_CIRCLES) / (uint32_t) LL_LED_NUM_STRIPE_PER_PLAYER))
+        else if(
+                i >= LL_LED_NUM_PER_PLAYER * p->player_lost &&
+                i <= LL_LED_NUM_PER_PLAYER * p->player_lost + LL_LED_NUM_PER_PLAYER )
         {
             continue;
         }
@@ -46,7 +49,7 @@ static void fade_leds(struct color *framebuffer, struct payload *p)
         if (c->a < 3 && c->a > 0)
         {
             p->zero_counter++;
-            ll_led_clear_pixel(framebuffer, i);
+            framebuffer[i].a = 0;
         } else
         {
             ll_led_set_pixel(framebuffer, c, i);
@@ -73,10 +76,17 @@ static void player_switch(struct color *framebuffer, struct payload *p, uint32_t
         ll_led_set_alpha_for_player_pixel(framebuffer, alpha, LL_LED_NUM_PER_BAR + i, p->player_lost);
     }
 
-    for(uint32_t i = 0; i < LL_LED_NUM_STRIPE_PER_PLAYER; i++)
+    for(uint32_t i = 0; i < ll_led_stripe_get_size_for_player(p->player_lost); i++)
     {
-        framebuffer[LL_LED_NUM_ALL_BARS_CIRCLES + (uint32_t) (i + (LL_LED_NUM_STRIPE_PER_PLAYER * p->player_lost))].a = alpha;
+        ll_led_stripe_set_alpha_for_player_pixel(framebuffer, i, alpha, p->player_lost);
     }
+}
+
+static void set_initial_led_colors(struct color *framebuffer, struct payload *p)
+{
+    ll_led_set_pixel_for_player(framebuffer, &RED, p->game->player[p->player_lost].lost_count - 1, p->player_lost);
+    ll_led_set_circle_color_for_player(framebuffer, &RED, p->player_lost);
+    ll_led_stripe_set_complete_player(framebuffer, &RED, p->player_lost);
 }
 
 static uint32_t start_animation(struct color *framebuffer, void *payload)
@@ -93,8 +103,9 @@ static uint32_t start_animation(struct color *framebuffer, void *payload)
         }
     }
 
-    p->run_step = STEP_SET_LOST_COLOR;
+    set_initial_led_colors(framebuffer, p);
 
+    p->run_step = STEP_FADE;
     p->zero_counter = 0;
     for(i = 0; i < LL_LED_NUM_LEDS; i++)
     {
@@ -114,16 +125,8 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
     static uint32_t wait_tm = LONG_WAIT;
     struct payload *p = payload;
 
-	uint32_t i;
-
     switch(p->run_step)
     {
-	    case STEP_SET_LOST_COLOR:
-		    ll_led_set_pixel_for_player(framebuffer, &RED, p->game->player[p->player_lost].lost_count - 1, p->player_lost);
-		    ll_led_set_circle_color_for_player(framebuffer, &RED, p->player_lost);
-		    ll_led_stripe_set_complete_player(framebuffer, &RED, p->player_lost);
-		    p->run_step = STEP_FADE;
-		    break;
         case STEP_FADE:
             fade_leds(framebuffer, p);
             if (p->zero_counter >= (LL_LED_NUM_LEDS - LL_LED_NUM_PER_PLAYER - LL_LED_NUM_STRIPE_PER_PLAYER))
@@ -191,6 +194,8 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 
 static uint32_t finish_animation(struct color *framebuffer, void *payload)
 {
+    struct payload *p = payload;
+    ll_led_clear_all_pixel_of_player(framebuffer, p->player_lost);
     return 1;
 }
 
