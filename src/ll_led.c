@@ -19,7 +19,7 @@ static struct stripe_pos stripe_positions[LL_PLAYER_NUM_PLAYERS] =
 				                        {58, 72},
 				                        {73, 86},
 				                        {87, 101},
-				                        {102, 115}
+				                        {102, 114}
 		                        };
 struct color * ll_led_create_framebuffer()
 {
