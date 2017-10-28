@@ -194,6 +194,73 @@ void ll_led_clear_all_pixel_of_player(struct color *framebuffer, uint32_t player
     memset(&framebuffer[LL_LED_NUM_PER_PLAYER * player], 0, sizeof(*framebuffer) * LL_LED_NUM_PER_PLAYER);
 }
 
+uint32_t ll_led_fade_leds_for_player_with_stripe(struct color *framebuffer, uint32_t player, enum LL_LED_FADE_DIR dir, float percent, uint8_t zero_threshold)
+{
+    uint32_t zero_counter = 0;
+    uint32_t i;
+
+    zero_counter += ll_led_fade_leds_for_player(framebuffer, player, dir, percent, zero_threshold);
+    uint32_t player_stripe_len = ll_led_stripe_get_size_for_player(player);
+    uint32_t offset = ll_led_stripe_get_absolute_start_pos(player);
+
+    for(i = 0; i < player_stripe_len; i++)
+    {
+        zero_counter += ll_led_fade_pixel(framebuffer, offset + i, dir, percent, zero_threshold);
+    }
+
+    return zero_counter;
+}
+
+uint32_t ll_led_fade_leds_for_player(struct color *framebuffer, uint32_t player, enum LL_LED_FADE_DIR dir, float percent, uint8_t zero_threshold)
+{
+    uint32_t i;
+    uint32_t zero_counter = 0;
+    for (i = 0; i < LL_LED_NUM_PER_PLAYER; i++)
+    {
+        zero_counter += ll_led_fade_pixel(framebuffer, LL_LED_NUM_PER_PLAYER * player + i, dir, percent, zero_threshold);
+    }
+    return zero_counter;
+}
+
+uint32_t ll_led_fade_leds(struct color *framebuffer, enum LL_LED_FADE_DIR dir, float percent, uint8_t zero_threshold)
+{
+    uint32_t i;
+    uint32_t zero_counter = 0;
+    for(i = 0; i < LL_LED_NUM_LEDS; i++)
+    {
+        zero_counter += ll_led_fade_pixel(framebuffer, i, dir, percent, zero_threshold);
+    }
+    return zero_counter;
+};
+
+uint32_t ll_led_fade_pixel(struct color *framebuffer, uint32_t pixel, enum LL_LED_FADE_DIR dir, float percent, uint8_t zero_threshold)
+{
+    struct color *c = &framebuffer[pixel];
+    if(dir == LL_LED_FADE_DIR_OUT)
+    {
+        c->a *= 1 - (percent / 100);
+        if (c->a < zero_threshold)
+        {
+            ll_led_clear_pixel(framebuffer, pixel);
+            return 1;
+        }
+    }
+    else
+    {
+        c->a *= 1 + (percent / 100);
+        if(c->a > zero_threshold)
+        {
+            c->a = 255;
+            ll_led_set_pixel(framebuffer, c, pixel);
+            return 1;
+        }
+    }
+
+    ll_led_set_pixel(framebuffer, c, pixel);
+
+    return 0;
+}
+
 /**
  * @brief sets a sepcific pixel on the stripe
  * @param framebuffer
