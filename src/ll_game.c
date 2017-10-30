@@ -158,7 +158,6 @@ static uint32_t ll_game_start(struct game *game)
 	game->state = LL_GAME_STATE_STARTING;
 
 	ll_anim_activate(LL_ANIM_GAME_START);
-	ll_anim_stop_animation();
 
 	return 1;
 }
@@ -210,7 +209,6 @@ static enum game_result ll_game_run(struct game *game)
 			{
                 //ll_anim_stop_animation();
 				ll_anim_activate(LL_ANIM_GAME_START);
-				ll_anim_stop_animation();
                 game->round_step = LL_ROUND_STEP_START;
 			}
 			break;
