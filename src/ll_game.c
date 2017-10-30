@@ -105,9 +105,8 @@ static uint32_t start_new_round(struct game *game)
         game->player[i].chips = 3;
     }
 
-	// TODO: activate whence LL_ANIM_ROUND_START is implemented
-	//ll_anim_activate(LL_ANIM_ROUND_START);
-	//ll_anim_stop_animation();
+	ll_anim_activate(LL_ANIM_ROUND_START);
+
     return 1;
 }
 
@@ -208,7 +207,6 @@ static enum game_result ll_game_run(struct game *game)
 			}
 			if(ll_switch_is_turned_on())
 			{
-				ll_anim_activate(LL_ANIM_GAME_START);
                 game->round_step = LL_ROUND_STEP_START;
 			}
 			break;
