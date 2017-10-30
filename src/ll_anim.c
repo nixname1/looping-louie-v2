@@ -110,7 +110,7 @@ void ll_anim_activate(enum LL_ANIMATION animation)
     mg_actual_animation = animation;
     mg_step = LL_ANIM_STEP_START;
     mg_is_active = 1;
-    mg_stop_request = 0;
+    mg_stop_request = !mg_animations[animation].is_loop_animation;
 }
 
 int32_t ll_anim_add(enum LL_ANIMATION anim_name, struct animation *anim)

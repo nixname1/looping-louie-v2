@@ -21,6 +21,7 @@ typedef void (*render_frame_cb)(struct color *framebuffer);
 struct animation
 {
     uint32_t speed;
+	uint32_t is_loop_animation;
     void *payload;
     animation_callback start_animation;
     animation_callback run_animation;

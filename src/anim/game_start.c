@@ -78,12 +78,13 @@ struct animation *anim_game_start_init(struct color *framebuffer)
     if (!anim)
         return NULL;
 
-    anim->payload          = &p;
-    anim->speed            = 60;
-    anim->start_animation  = start_animation;
-    anim->run_animation    = run_animation;
-    anim->finish_animation = finish_animation;
-    anim->framebuffer      = framebuffer;
+    anim->payload           = &p;
+    anim->speed             = 60;
+	anim->is_loop_animation = 0;
+    anim->start_animation   = start_animation;
+    anim->run_animation     = run_animation;
+    anim->finish_animation  = finish_animation;
+    anim->framebuffer       = framebuffer;
 
     return anim;
 }

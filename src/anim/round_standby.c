@@ -42,12 +42,13 @@ struct animation *anim_round_standby_init(struct color *framebuffer, struct game
 
     p.game = game;
 
-    anim->payload          = &p;
-    anim->speed            = 60;
-    anim->start_animation  = start_animation;
-    anim->run_animation    = run_animation;
-    anim->finish_animation = finish_animation;
-    anim->framebuffer      = framebuffer;
+    anim->payload           = &p;
+    anim->speed             = 60;
+    anim->is_loop_animation = 1;
+    anim->start_animation   = start_animation;
+    anim->run_animation     = run_animation;
+    anim->finish_animation  = finish_animation;
+    anim->framebuffer       = framebuffer;
 
     return anim;
 }
