@@ -203,11 +203,11 @@ static enum game_result ll_game_run(struct game *game)
 		case LL_ROUND_STEP_WAIT_FOR_START:
 			if(!ll_anim_is_active())
 			{
-				ll_anim_activate(LL_ANIM_ROUND_STANDBY);
+                // TODO: activate as soon as the animation is implemented
+				// ll_anim_activate(LL_ANIM_ROUND_STANDBY);
 			}
 			if(ll_switch_is_turned_on())
 			{
-                //ll_anim_stop_animation();
 				ll_anim_activate(LL_ANIM_GAME_START);
                 game->round_step = LL_ROUND_STEP_START;
 			}
