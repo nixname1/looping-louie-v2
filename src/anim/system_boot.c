@@ -1,4 +1,5 @@
 #include <stdlib.h>
+
 #include "ll_anim.h"
 #include "ll_led.h"
 
@@ -8,13 +9,10 @@ struct payload
 {
     uint32_t bar_cnt;
     uint32_t ring_cnt;
-	uint32_t zero_counter;
 };
 
 uint32_t start_animation(struct color *framebuffer, void *payload);
-
 uint32_t run_animation(struct color *framebuffer, void *payload);
-
 uint32_t finish_animation(struct color *framebuffer, void *payload);
 
 
@@ -56,7 +54,6 @@ uint32_t start_animation(struct color *framebuffer, void *payload)
 {
 	struct payload *p = payload;
 
-	p->zero_counter = 0;
     p->bar_cnt = 0;
     p->ring_cnt = 0;
 	ll_led_clear_all_pixel(framebuffer);
@@ -77,7 +74,6 @@ uint32_t run_animation(struct color *framebuffer, void *payload)
 
     p->ring_cnt++;
     p->bar_cnt++;
-
 
     if(p->ring_cnt >= 2)
     {
@@ -108,14 +104,14 @@ uint32_t finish_animation(struct color *framebuffer, void *payload)
 	uint32_t ret = 0;
 	uint32_t i;
 	struct payload *p = payload;
+	uint32_t zero_counter = 0;
 
-	// and add fading out
-	p->zero_counter = 0;
+	// add fading out
 	for(i = 0; i < LL_PLAYER_NUM_PLAYERS; i++)
 	{
-		p->zero_counter += ll_led_fade_leds_for_player(framebuffer, i, LL_LED_FADE_DIR_OUT, 5, 3);
+		zero_counter += ll_led_fade_leds_for_player(framebuffer, i, LL_LED_FADE_DIR_OUT, 5, 3);
 	}
-	if(p->zero_counter >= LL_LED_NUM_ALL_BARS_CIRCLES)
+	if(zero_counter >= LL_LED_NUM_ALL_BARS_CIRCLES)
 	{
 		return 1;
 	}
