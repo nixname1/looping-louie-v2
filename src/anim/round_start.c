@@ -3,19 +3,40 @@
 
 #include "ll_led.h"
 #include "ll_anim.h"
+#include "anim/round_run.h"
 #include "anim/round_start.h"
+#include "../../../simulation_renderer.h"
+
+#define STEPS ((uint8_t) 30)
 
 struct payload
 {
     struct game *game;
+    uint8_t step_count;
+    uint8_t org_alpha[LL_LED_NUM_LEDS];
+	uint8_t alpha_step[LL_LED_NUM_LEDS];
+    uint8_t padd1;
 };
+
+static void set_initial_led_colors(struct color *framebuffer, struct payload *p)
+{
+    ll_anim_round_run_generate_colors(framebuffer, p->game);
+}
 
 static uint32_t start_animation(struct color *framebuffer, void *payload)
 {
     struct payload *p = payload;
+    uint32_t i;
 
+    p->step_count = 0;
 
-
+    set_initial_led_colors(framebuffer, p);
+    for(i = 0; i < LL_LED_NUM_LEDS; i++)
+    {
+        p->org_alpha[i] = framebuffer[i].a;
+        p->alpha_step[i] = framebuffer[i].a / STEPS;
+        ll_led_set_alpha(framebuffer, 0, i);
+    }
     return 1;
 }
 
@@ -23,23 +44,25 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 {
     struct payload *p = payload;
     uint32_t i;
-    uint32_t threshold_counter = 0;
 
-    for(i = 0; i < p->game->player_count; i++)
+    for(i = 0; i < LL_LED_NUM_LEDS; i++)
     {
-        threshold_counter += ll_led_fade_leds_for_player_with_stripe(framebuffer, i, LL_LED_FADE_DIR_IN, 1, 2);
+        framebuffer[i].a += p->alpha_step[i];
     }
 
-    if(threshold_counter >= LL_LED_NUM_LEDS)
+    if(p->step_count >= STEPS)
     {
         return 1;
     }
+    p->step_count++;
+
     return 0;
 }
 
 static uint32_t finish_animation(struct color *framebuffer, void *payload)
 {
     struct payload *p = payload;
+    ll_anim_round_run_generate_colors(framebuffer, p->game);
     return 1;
 }
 
