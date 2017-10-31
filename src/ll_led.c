@@ -153,6 +153,11 @@ void ll_led_set_pixel(struct color *framebuffer, struct color *color, uint32_t l
     memcpy(&framebuffer[led], color, sizeof(*framebuffer));
 }
 
+void ll_led_set_alpha(struct color *framebuffer, uint8_t alpha, uint32_t pos)
+{
+    framebuffer[pos].a = alpha;
+}
+
 /**
  * @brief   sets the alpha value for a specific pixel
  * @param pixel_number  number of the pixel to dimm
@@ -160,7 +165,7 @@ void ll_led_set_pixel(struct color *framebuffer, struct color *color, uint32_t l
  */
 void ll_led_set_alpha_for_player_pixel(struct color *framebuffer, uint8_t alpha, uint32_t pixel_number, uint32_t player)
 {
-	framebuffer[player * LL_LED_NUM_PER_PLAYER + pixel_number].a = alpha;
+    ll_led_set_alpha(framebuffer, alpha, player * LL_LED_NUM_PER_PLAYER + pixel_number);
 }
 
 /**
@@ -303,5 +308,5 @@ void ll_led_stripe_set_complete_player(struct color *framebuffer, struct color *
 
 void ll_led_stripe_set_alpha_for_player_pixel(struct color *framebuffer, uint32_t pos, uint8_t alpha, uint32_t player)
 {
-	framebuffer[LL_LED_NUM_ALL_BARS_CIRCLES + ll_led_stripe_get_start_pos(player) + pos].a = alpha;
+    ll_led_set_alpha(framebuffer, alpha, LL_LED_NUM_ALL_BARS_CIRCLES + ll_led_stripe_get_start_pos(player) + pos);
 }
