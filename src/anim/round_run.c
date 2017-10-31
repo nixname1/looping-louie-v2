@@ -11,15 +11,8 @@ struct payload
     struct game *game;
 };
 
-static uint32_t start_animation(struct color *framebuffer, void *payload)
+void ll_anim_round_run_generate_colors(struct color *framebuffer, struct game *game)
 {
-    return 1;
-}
-
-static uint32_t run_animation(struct color *framebuffer, void *payload)
-{
-    struct payload *p = payload;
-    struct game *game = p->game;
     struct color col;
     uint32_t i;
     for(i = 0; i < game->player_count; i++)
@@ -43,12 +36,25 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
         }
         ll_led_set_circle_color_for_player(framebuffer, &col, i);
 
-        for(uint32_t j = 0; j < p->game->player[i].lost_count; j++)
+        ll_led_stripe_set_complete_player(framebuffer, ll_player_get_color(i), i);
+
+        for(uint32_t j = 0; j < game->player[i].lost_count; j++)
         {
-			ll_led_set_pixel_for_player(framebuffer, ll_player_get_color(i), j, i);
+            ll_led_set_pixel_for_player(framebuffer, ll_player_get_color(i), j, i);
         }
     }
+}
 
+static uint32_t start_animation(struct color *framebuffer, void *payload)
+{
+    return 1;
+}
+
+static uint32_t run_animation(struct color *framebuffer, void *payload)
+{
+    struct payload *p = payload;
+
+    ll_anim_round_run_generate_colors(framebuffer, p->game);
 
     return 1;
 }
