@@ -56,10 +56,10 @@ void ll_led_clear_pixel_of_player(struct color *framebuffer, uint32_t pixel_numb
 void ll_led_clear_pixel(struct color *framebuffer, uint32_t pixel_number);
 void ll_led_clear_all_pixel(struct color *framebuffer);
 void ll_led_clear_all_pixel_of_player(struct color *framebuffer, uint32_t player);
-uint32_t ll_led_fade_leds_for_player_with_stripe(struct color *framebuffer, uint32_t player, enum LL_LED_FADE_DIR dir, float percent, uint8_t threshold);
-uint32_t ll_led_fade_leds_for_player(struct color *framebuffer, uint32_t player, enum LL_LED_FADE_DIR dir, float percent, uint8_t threshold);
-uint32_t ll_led_fade_leds(struct color *framebuffer, enum LL_LED_FADE_DIR dir, float percent, uint8_t threshold);
-uint32_t ll_led_fade_pixel(struct color *framebuffer, uint32_t pixel, enum LL_LED_FADE_DIR dir, float percent, uint8_t threshold);
+uint32_t ll_led_fade_leds_for_player_with_stripe(struct color *framebuffer, uint32_t player, enum LL_LED_FADE_DIR dir, uint8_t percent, uint8_t threshold);
+uint32_t ll_led_fade_leds_for_player(struct color *framebuffer, uint32_t player, enum LL_LED_FADE_DIR dir, uint8_t percent, uint8_t threshold);
+uint32_t ll_led_fade_leds(struct color *framebuffer, enum LL_LED_FADE_DIR dir, uint8_t percent, uint8_t threshold);
+uint32_t ll_led_fade_pixel(struct color *framebuffer, uint32_t pixel, enum LL_LED_FADE_DIR dir, uint8_t percent, uint8_t threshold);
 void ll_led_stripe_set_pixel(struct color *framebuffer, struct color *new_pixel, uint32_t pos);
 void ll_led_stripe_set_pixel_for_player(struct color *framebuffer, struct color *new_pixel, uint32_t pos, uint32_t player);
 void ll_led_stripe_set_complete_player(struct color *framebuffer, struct color *col, uint32_t player);

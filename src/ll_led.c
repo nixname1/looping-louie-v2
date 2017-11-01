@@ -200,7 +200,7 @@ void ll_led_clear_all_pixel_of_player(struct color *framebuffer, uint32_t player
     memset(&framebuffer[LL_LED_NUM_PER_PLAYER * player], 0, sizeof(*framebuffer) * LL_LED_NUM_PER_PLAYER);
 }
 
-uint32_t ll_led_fade_leds_for_player_with_stripe(struct color *framebuffer, uint32_t player, enum LL_LED_FADE_DIR dir, float percent, uint8_t threshold)
+uint32_t ll_led_fade_leds_for_player_with_stripe(struct color *framebuffer, uint32_t player, enum LL_LED_FADE_DIR dir, uint8_t percent, uint8_t threshold)
 {
     uint32_t zero_counter = 0;
     uint32_t i;
@@ -217,7 +217,7 @@ uint32_t ll_led_fade_leds_for_player_with_stripe(struct color *framebuffer, uint
     return zero_counter;
 }
 
-uint32_t ll_led_fade_leds_for_player(struct color *framebuffer, uint32_t player, enum LL_LED_FADE_DIR dir, float percent, uint8_t threshold)
+uint32_t ll_led_fade_leds_for_player(struct color *framebuffer, uint32_t player, enum LL_LED_FADE_DIR dir, uint8_t percent, uint8_t threshold)
 {
     uint32_t i;
     uint32_t zero_counter = 0;
@@ -228,7 +228,7 @@ uint32_t ll_led_fade_leds_for_player(struct color *framebuffer, uint32_t player,
     return zero_counter;
 }
 
-uint32_t ll_led_fade_leds(struct color *framebuffer, enum LL_LED_FADE_DIR dir, float percent, uint8_t threshold)
+uint32_t ll_led_fade_leds(struct color *framebuffer, enum LL_LED_FADE_DIR dir, uint8_t percent, uint8_t threshold)
 {
     uint32_t i;
     uint32_t zero_counter = 0;
@@ -239,7 +239,7 @@ uint32_t ll_led_fade_leds(struct color *framebuffer, enum LL_LED_FADE_DIR dir, f
     return zero_counter;
 };
 
-uint32_t ll_led_fade_pixel(struct color *framebuffer, uint32_t pixel, enum LL_LED_FADE_DIR dir, float percent, uint8_t threshold)
+uint32_t ll_led_fade_pixel(struct color *framebuffer, uint32_t pixel, enum LL_LED_FADE_DIR dir, uint8_t percent, uint8_t threshold)
 {
     struct color *c = &framebuffer[pixel];
     uint32_t ret = 0;
@@ -251,8 +251,8 @@ uint32_t ll_led_fade_pixel(struct color *framebuffer, uint32_t pixel, enum LL_LE
     }
     else
     {
-        val = (uint8_t) 255 - c->a;
-        threshold = (uint8_t) 255 - threshold;
+        val = (uint8_t) (255 - c->a);
+        threshold = (uint8_t) (255 - threshold);
     }
 
     if(val == 0)
@@ -260,7 +260,7 @@ uint32_t ll_led_fade_pixel(struct color *framebuffer, uint32_t pixel, enum LL_LE
         return 1;
     }
 
-    val *= 1 - (percent / 100);
+    val = (uint8_t) (val * (1 - (percent / 100)));
 
     if(val < threshold)
     {
@@ -274,7 +274,7 @@ uint32_t ll_led_fade_pixel(struct color *framebuffer, uint32_t pixel, enum LL_LE
     }
     else
     {
-        c->a = (uint8_t) 255 - val;
+        c->a = (uint8_t) (255 - val);
     }
 
     ll_led_set_pixel(framebuffer, c, pixel);
