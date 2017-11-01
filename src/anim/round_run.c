@@ -47,6 +47,9 @@ void ll_anim_round_run_generate_colors(struct color *framebuffer, struct game *g
 
 static uint32_t start_animation(struct color *framebuffer, void *payload)
 {
+    (void)(framebuffer);
+    (void)(payload);
+
     return 1;
 }
 
@@ -61,6 +64,9 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 
 static uint32_t finish_animation(struct color *framebuffer, void *payload)
 {
+    (void)(framebuffer);
+    (void)(payload);
+
     return 1;
 }
 
