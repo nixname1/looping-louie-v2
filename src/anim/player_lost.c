@@ -22,6 +22,9 @@ struct payload
     uint32_t player_lost;
     uint32_t zero_counter;
     enum step run_step;
+	uint8_t padd1;
+	uint8_t padd2;
+	uint8_t padd3;
 };
 
 static void fade_leds(struct color *framebuffer, struct payload *p)
