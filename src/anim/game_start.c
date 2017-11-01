@@ -14,6 +14,8 @@ static uint32_t start_animation(struct color *framebuffer, void *payload)
 {
 	struct payload *p = payload;
 
+	(void)(framebuffer);
+
 	p->led_counter = 0;
 
     return 1;
@@ -25,7 +27,7 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 	static uint32_t ring_cnt = 0;
 	struct payload *p = payload;
 	struct color *col;
-	uint32_t player_number = (p->led_counter) / (LL_LED_NUM_STRIPE_PER_PLAYER);
+	uint32_t player_number = (uint32_t) ((uint32_t) (p->led_counter) / (uint32_t) (LL_LED_NUM_STRIPE_PER_PLAYER));
     uint32_t led_index;
 
 	if(p->led_counter >= LL_LED_NUM_STRIPE)
@@ -67,6 +69,9 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 
 static uint32_t finish_animation(struct color *framebuffer, void *payload)
 {
+	(void)(framebuffer);
+	(void)(payload);
+
     return 1;
 }
 
