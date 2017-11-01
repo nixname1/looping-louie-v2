@@ -23,7 +23,7 @@ include_directories(include system/include system/include/cmsis system/include/s
 add_definitions(-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16)
 
 #add global defines
-add_definitions(-DSTM32F411xE -DDEBUG -DOS_USE_TRACE_SEMIHOSTING_DEBUG -DUSE_HAL_DRIVER -DHSE_VALUE=8000000)
+add_definitions(-DSTM32F411xE -DUSE_HAL_DRIVER -DHSE_VALUE=8000000)
 
 #add global flags
 add_definitions(-fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -flto -std=gnu11)
@@ -44,15 +44,12 @@ add_definitions(-Wunused
         -Wlogical-op
         -Waggregate-return
         -Wfloat-equal)
-#warnings only for gcc - not for g++
-set(CMAKE_C_FLAGS_DEBUG -Wmissing-prototypes -Wstrict-prototypes -Wbad-function-cast)
-set(CMAKE_C_FLAGS_RELEASE -Wmissing-prototypes -Wstrict-prototypes -Wbad-function-cast)
 
-#add debug flags
-set(CMAKE_C_FLAGS_DEBUG "-DDEBUG -DUSE_FULL_ASSERT -DTRACE -O0 -g3 -fno-move-loop-invariants")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wmissing-prototypes -Wstrict-prototypes -Wbad-function-cast ")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG -DTRACE -DOS_USE_TRACE_SEMIHOSTING_DEBUG -DUSE_FULL_ASSERT")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -g3 -fno-move-loop-invariants")
 
-#add release flags
-set(CMAKE_C_FLAGS_RELEASE "-O3")
+set(CMAKE_C_FLAGS_RELEASE "-Wmissing-prototypes -Wstrict-prototypes -Wbad-function-cast -O3")
 
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/ldscripts /usr/arm-none-eabi/lib/fpu /usr/lib/gcc/arm-none-eabi/6.2.0/fpu)
 
