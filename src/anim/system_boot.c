@@ -16,7 +16,7 @@ uint32_t run_animation(struct color *framebuffer, void *payload);
 uint32_t finish_animation(struct color *framebuffer, void *payload);
 
 
-static void set_initial_led_colors(struct color *framebuffer, struct payload *p)
+static void set_initial_led_colors(struct color *framebuffer)
 {
 	uint8_t i, j;
 	uint8_t factor;
@@ -27,17 +27,17 @@ static void set_initial_led_colors(struct color *framebuffer, struct payload *p)
 		for (j = 0; j < LL_LED_NUM_PER_CIRCLE / 2; j++)
 		{
 			factor = 255 / (LL_LED_NUM_PER_CIRCLE / 2);
-			c->a = factor * (j + (uint8_t) 1);
+			c->a = (uint8_t) (factor * (j + (uint8_t) 1));
 
-			ll_led_set_pixel_for_player(framebuffer, c, LL_LED_NUM_PER_BAR + j, i);
-			ll_led_set_pixel_for_player(framebuffer, c, (uint8_t) LL_LED_NUM_PER_BAR +
-			                            ((uint8_t) LL_LED_NUM_PER_CIRCLE - j - (uint8_t) 1), i);
+			ll_led_set_pixel_for_player(framebuffer, c, (uint32_t) LL_LED_NUM_PER_BAR + j, i);
+			ll_led_set_pixel_for_player(framebuffer, c, (uint32_t) LL_LED_NUM_PER_BAR +
+			                            ((uint32_t) LL_LED_NUM_PER_CIRCLE - j - 1), i);
 		}
 
 		factor = 255 / (LL_LED_NUM_PER_BAR);
 		for (j = 0; j < LL_LED_NUM_PER_BAR; j++)
 		{
-			c->a = factor * (j + (uint8_t) 1);
+			c->a = (uint8_t) (factor * (j + (uint8_t) 1));
 			ll_led_set_pixel_for_player(framebuffer, c, j, i);
 		}
 
@@ -57,7 +57,7 @@ uint32_t start_animation(struct color *framebuffer, void *payload)
     p->bar_cnt = 0;
     p->ring_cnt = 0;
 	ll_led_clear_all_pixel(framebuffer);
-	set_initial_led_colors(framebuffer, p);
+	set_initial_led_colors(framebuffer);
 
 	return 1;
 }
@@ -103,7 +103,6 @@ uint32_t finish_animation(struct color *framebuffer, void *payload)
 {
 	uint32_t ret = 0;
 	uint32_t i;
-	struct payload *p = payload;
 	uint32_t zero_counter = 0;
 
 	// add fading out
