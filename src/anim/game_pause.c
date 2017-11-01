@@ -72,18 +72,18 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 			p->step_count++;
 			for (uint32_t i = 0; i < LL_LED_NUM_LEDS; ++i)
 			{
-				framebuffer[i].a -= p->alpha_step[i];
+				framebuffer[i].a = (uint8_t) (framebuffer[i].a - p->alpha_step[i]);
 			}
-			p->brightness_reference -= p->alpha_step[LL_LED_NUM_LEDS];
+			p->brightness_reference = (uint8_t) (p->brightness_reference - p->alpha_step[LL_LED_NUM_LEDS]);
 			break;
 
 		case STEP_UP:
 			p->step_count++;
 			for (uint32_t i = 0; i < LL_LED_NUM_LEDS; ++i)
 			{
-				framebuffer[i].a += p->alpha_step[i];
+				framebuffer[i].a = (uint8_t) (framebuffer[i].a + p->alpha_step[i]);
 			}
-			p->brightness_reference += p->alpha_step[LL_LED_NUM_LEDS];
+			p->brightness_reference = (uint8_t) (p->brightness_reference + p->alpha_step[LL_LED_NUM_LEDS]);
 			break;
 	}
 	return 1;
@@ -99,9 +99,9 @@ static uint32_t finish_animation(struct color *framebuffer, void *payload)
 
 	for (uint32_t i = 0; i < LL_LED_NUM_LEDS; ++i)
 	{
-		framebuffer[i].a += p->alpha_step[i];
+		framebuffer[i].a = (uint8_t) (framebuffer[i].a + p->alpha_step[i]);
 	}
-	p->brightness_reference += p->alpha_step[LL_LED_NUM_LEDS];
+	p->brightness_reference = (uint8_t) (p->brightness_reference + p->alpha_step[LL_LED_NUM_LEDS]);
 
 	return 0;
 }
