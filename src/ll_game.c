@@ -3,6 +3,7 @@
 #include "ll_anim.h"
 #include "ll_switch.h"
 #include "ll_lightbarrier.h"
+#include "ll_motor.h"
 #include "ll_game.h"
 
 enum ll_system_step
@@ -116,6 +117,8 @@ static enum round_result run_round(struct game *game)
 
 	// TODO: run motor here
 
+    ll_motor_run();
+
 	if(!ll_switch_is_turned_on())
 	{
 		return ROUND_RESULT_PAUSED;
@@ -182,10 +185,12 @@ static enum game_result ll_game_run(struct game *game)
 				    break;
 
 			    case ROUND_RESULT_PLAYER_LOST:
+                    ll_motor_stop();
 					game->round_step = LL_ROUND_STEP_END;
 				    break;
 
 			    case ROUND_RESULT_PAUSED:
+                    ll_motor_stop();
 				    ret = GAME_RESULT_PAUSED;
 				    break;
 		    }
