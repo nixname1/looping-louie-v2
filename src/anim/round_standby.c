@@ -17,18 +17,25 @@ struct payload
 
 static uint32_t start_animation(struct color *framebuffer, void *payload)
 {
-    struct payload *p = payload;
+    (void)(framebuffer);
+    (void)(payload);
+
     return 1;
 }
 
 static uint32_t run_animation(struct color *framebuffer, void *payload)
 {
-    struct payload *p = payload;
+    (void)(framebuffer);
+    (void)(payload);
+
     return 1;
 }
 
 static uint32_t finish_animation(struct color *framebuffer, void *payload)
 {
+    (void)(framebuffer);
+    (void)(payload);
+
     return 1;
 }
 
