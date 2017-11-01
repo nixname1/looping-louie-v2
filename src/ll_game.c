@@ -96,7 +96,8 @@ static uint32_t run_system_boot(uint64_t systime)
 
 static uint32_t start_new_round(struct game *game)
 {
-	if(game->round_counter == 0)
+	game->round_counter++;
+	if(game->round_counter == 1)
 	{
 		return 1;
 	}
@@ -199,7 +200,6 @@ static enum game_result ll_game_run(struct game *game)
             if(end_round(game))
             {
                 game->round_step = LL_ROUND_STEP_WAIT_FOR_START;
-	            game->round_counter++;
             }
             if(game->player_lost->lost_count >= LL_LED_NUM_PER_BAR)
             {
