@@ -39,15 +39,12 @@ enum game_result
 	GAME_RESULT_END
 };
 
-void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrier, uint64_t event_time, void *payload)
+void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrier, __unused uint64_t event_time, void *payload)
 {
 	struct game *game = payload;
-	static uint64_t event_start_time;
-	static uint64_t event_end_time;
 
 	if(event == LL_EXT_EVENT_START)
 	{
-		event_start_time = event_time;
         if(game->state == LL_GAME_STATE_RUNNING && game->round_step == LL_ROUND_STEP_RUN)
         {
             if (game->player[lightbarrier].chips > 0)
@@ -55,10 +52,6 @@ void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrie
                 game->player[lightbarrier].chips--;
             }
         }
-	}
-	else if(event == LL_EXT_EVENT_END)
-	{
-		event_end_time = event_time;
 	}
 }
 
@@ -96,8 +89,7 @@ static uint32_t run_system_boot(uint64_t systime)
 
 static uint32_t start_new_round(struct game *game)
 {
-	game->round_counter++;
-	if(game->round_counter == 1)
+	if(game->round_counter == 0)
 	{
 		return 1;
 	}
@@ -150,6 +142,7 @@ static uint32_t end_round(struct game *game)
 	if(!ll_switch_is_turned_on())
 	{
 		ret = 1;
+		game->round_counter++;
 		ll_anim_stop_animation();
 	}
     return ret;
