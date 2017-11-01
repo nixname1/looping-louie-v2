@@ -5,7 +5,6 @@
 #include "ll_anim.h"
 #include "anim/round_run.h"
 #include "anim/round_start.h"
-#include "../../../simulation_renderer.h"
 
 #define STEPS ((uint8_t) 30)
 
