@@ -47,7 +47,7 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 
     for(i = 0; i < LL_LED_NUM_LEDS; i++)
     {
-        framebuffer[i].a += p->alpha_step[i];
+        framebuffer[i].a = (uint8_t) (framebuffer[i].a + p->alpha_step[i]);
     }
 
     if(p->step_count >= STEPS)
