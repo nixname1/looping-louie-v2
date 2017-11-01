@@ -135,7 +135,6 @@ static enum round_result run_round(struct game *game)
 		{
             game->player[i].lost_count++;
 			game->player_lost = &game->player[i];
-			ll_anim_stop_animation();
             ll_anim_activate(LL_ANIM_PLAYER_LOST);
 			return ROUND_RESULT_PLAYER_LOST;
 		}
@@ -202,6 +201,10 @@ static enum game_result ll_game_run(struct game *game)
                 game->round_step = LL_ROUND_STEP_WAIT_FOR_START;
 	            game->round_counter++;
             }
+            if(game->player_lost->lost_count >= LL_LED_NUM_PER_BAR)
+            {
+                return GAME_RESULT_END;
+            }
             break;
 
 		case LL_ROUND_STEP_WAIT_FOR_START:
@@ -241,9 +244,15 @@ static uint32_t ll_game_pause(struct game *game)
 	return ret;
 }
 
-static void ll_game_stop(struct game *game)
+static uint32_t ll_game_end(struct game *game)
 {
-	game->state = LL_GAME_STATE_STOPPING;
+    if(!ll_switch_is_turned_on())
+    {
+        ll_anim_stop_animation();
+        return 1;
+    }
+	game->state = LL_GAME_STATE_ENDED;
+    return 0;
 }
 
 void ll_game_loop_run(struct game *game, uint64_t systime)
@@ -291,10 +300,10 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 			break;
 
 		case LL_SYSTEM_STEP_GAME_EXIT:
-			// after a game was lost or we got the switch combination
-			// on -> off -> on -> off within 1 second
-			// TODO: print some exit animation
-			actual_system_step = LL_SYSTEM_STEP_STANDBY;
+            if(ll_game_end(game))
+            {
+                actual_system_step = LL_SYSTEM_STEP_STANDBY;
+            }
 			break;
 
 		case LL_SYSTEM_STEP_STANDBY:
