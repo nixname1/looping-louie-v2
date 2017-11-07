@@ -26,32 +26,27 @@ add_definitions(-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16)
 add_definitions(-DSTM32F411xE -DUSE_HAL_DRIVER -DHSE_VALUE=8000000)
 
 #add global flags
-add_definitions(-fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -flto -std=gnu11)
+add_definitions(-fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -flto)
 
 #add global warnings
 add_definitions(-Wunused
         -Wuninitialized
         -Wall
-        -Wbad-function-cast
         -Wextra
         -Wmissing-declarations
-        -Wmissing-prototypes
         -Wconversion
         -Wpointer-arith
-        -Wstrict-prototypes
         -Wpadded
         -Wshadow
         -Wlogical-op
         -Waggregate-return
         -Wfloat-equal)
 
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wmissing-prototypes -Wstrict-prototypes -Wbad-function-cast ")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG -DTRACE -DOS_USE_TRACE_SEMIHOSTING_DEBUG -DUSE_FULL_ASSERT")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -g3 -fno-move-loop-invariants")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -DDEBUG -DTRACE -DOS_USE_TRACE_SEMIHOSTING_DEBUG -DUSE_FULL_ASSERT -fno-move-loop-invariants -Wmissing-prototypes -Wstrict-prototypes -Wbad-function-cast -std=gnu11")
 
 set(CMAKE_C_FLAGS_RELEASE "-Wmissing-prototypes -Wstrict-prototypes -Wbad-function-cast -O3")
 
-LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/ldscripts /usr/arm-none-eabi/lib/fpu /usr/lib/gcc/arm-none-eabi/6.2.0/fpu)
+LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/ldscripts)
 
 set(SOURCE_FILES
     src/_initialize_hardware.c
@@ -74,7 +69,7 @@ set(SOURCE_FILES
     src/hardware/ll_gpio.c
     src/hardware/ll_74hc166.c
     src/hardware/ll_renderer.c
-    #src/stm32f4xx_hal_msp.c
+    src/stm32f4xx_hal_msp.c
     system/src/cmsis/system_stm32f4xx.c
     system/src/cmsis/vectors_stm32f411xe.c
     system/src/cortexm/_initialize_hardware.c
@@ -160,4 +155,4 @@ set(SOURCE_FILES
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,-Map,${CMAKE_BINARY_DIR}/${PROJECT_NAME}.map -T libs.ld -T mem.ld -T sections.ld -Xlinker --gc-sections -nostartfiles -flto -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb --specs=nano.specs -fdata-sections -ffreestanding -ffunction-sections -flto -fmessage-length=0 -fsigned-char")
+set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,-Map,${CMAKE_BINARY_DIR}/${PROJECT_NAME}.map -T libs.ld -T mem.ld -T sections.ld -Xlinker --gc-sections -nostartfiles -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb --specs=nano.specs -fdata-sections -ffreestanding -ffunction-sections -flto -fmessage-length=0 -fno-move-loop-invariants -fsigned-char")
