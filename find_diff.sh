@@ -26,7 +26,7 @@ function get_last_parameter()
 
 function check_for_compile_call()
 {
-    ELF_CALL=$(echo $input | grep '\.elf')
+    ELF_CALL=$(echo $1 | grep '\.elf')
     if [[ $ELF_CALL == "" ]]
     then
         return 1
