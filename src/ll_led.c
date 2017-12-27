@@ -260,7 +260,7 @@ uint32_t ll_led_fade_pixel(struct color *framebuffer, uint32_t pixel, enum LL_LE
         return 1;
     }
 
-    val = (uint8_t) (val * (1 - (percent / 100)));
+    val = (uint8_t) (val * (1 - (percent / 100.0)));
 
     if(val < threshold)
     {
