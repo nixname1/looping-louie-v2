@@ -58,7 +58,7 @@ int ll_motor_set_new_random_speed()
     int rand_tmp;
     int speed_precent;
 
-    rand_tmp = rand();
+    rand_tmp = random();
     // generate a direction
     if (rand_tmp >= ((RAND_MAX / 100) * 90)) // a change of 10% to get reverse
     {
@@ -74,7 +74,7 @@ int ll_motor_set_new_random_speed()
     }
 
     // speed in precent from 1% to 100%
-    speed_precent = (rand() % 100) + 1;
+    speed_precent = (random() % 100) + 1;
     switch (direction)
     {
         case LL_MOTOR_REVERSE:
@@ -120,15 +120,15 @@ void ll_motor_run()
     {
         ll_motor_set_new_random_speed();
 
-        rand_tmp = (rand() % rnd_max) + 1;
+        rand_tmp = (random() % rnd_max) + 1;
 
         if (rand_tmp >= (rnd_max / 100) * 80) // 20%
         {
             // |- one second -|- t_max-t_min + 2sec -|- one second -|
             // |----- 10% ----|-------- 80% ---------|----- 10% ----|
 
-            speed_time = (rand() % 500); // one second
-            if ((rand() % 2))
+            speed_time = (random() % 500); // one second
+            if ((random() % 2))
             {
                 speed_time += t_min; // low area
             }
@@ -140,7 +140,7 @@ void ll_motor_run()
         else
         {
             //            random         range  - 8*500ms  + offset
-            speed_time = (rand() % (t_max - t_min - 1000)) + t_min;
+            speed_time = (random() % (t_max - t_min - 1000)) + t_min;
         }
 
         mg_next_speed_change = ll_system_get_systime()

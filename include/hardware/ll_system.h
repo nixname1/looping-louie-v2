@@ -16,7 +16,7 @@ void ll_system_game_start(void);
 void ll_system_game_stop(void);
 
 /** general functions */
-void ll_system_rand_init(void);
+void ll_system_random_init(void);
 
 void ll_system_debug_init(void);
 void ll_system_debug_led_on(void);

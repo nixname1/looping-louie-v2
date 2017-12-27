@@ -21,9 +21,9 @@ void ll_system_init()
 }
 
 /**
- * @brief initialize rand()
+ * @brief initialize random()
  */
-void ll_system_rand_init()
+void ll_system_random_init()
 {
     uint32_t adc_val;
     uint32_t tmp;
@@ -46,7 +46,7 @@ void ll_system_rand_init()
     }
 
     adc_val = ADC1->DR;
-    srand(adc_val);
+    srandom(adc_val);
 
     // disable ADC again - not needed anymore
     RCC->APB2ENR &= ~RCC_APB2ENR_ADC1EN; // clock adc1
