@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	ll_system_debug_init();
 #endif
 	ll_system_init();
-    ll_system_rand_init();
+    ll_system_random_init();
     ll_motor_init();
     ll_74hc166_init();
     ll_gpio_init();
