@@ -28,20 +28,29 @@ void ll_pwm_init()
  */
 void ll_pwm_set_speed_in_percent(uint32_t speed_percent, enum ll_motor_direction dir)
 {
+	static enum ll_motor_direction old_direction = LL_MOTOR_STOP;
+	uint32_t val = 0;
+
 	if(dir == LL_MOTOR_FORWARD)
 	{
-		TIM3->CCR1 = 1180 + (uint32_t) ((double) speed_percent * 2.5);
+		speed_percent = 100 - speed_percent;
+		val = 1180 + (uint32_t) ((double) speed_percent * 2.1);
 	}
 	else if(dir == LL_MOTOR_STOP)
 	{
-		TIM3->CCR1 = 1430;
+		val = 1430;
 	}
 	else
 	{
-		TIM3->CCR1 = 1850;
-		delay_ms(100);
-		TIM3->CCR1 = 1430;
-		delay_ms(100);
-		TIM3->CCR1 = 1680 + (uint32_t) ((double) speed_percent * 3.6);
+		if(old_direction != LL_MOTOR_REVERSE)
+		{
+			TIM3->CCR1 = 1850;
+			delay_ms(100);
+			TIM3->CCR1 = 1430;
+			delay_ms(100);
+		}
+		val = 1590 + (uint32_t) ((double) speed_percent * 4.6);
 	}
+	TIM3->CCR1 = val;
+	old_direction = dir;
 }
