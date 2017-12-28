@@ -150,11 +150,24 @@ static uint32_t end_round(struct game *game)
 
 static uint32_t ll_game_start(struct game *game)
 {
-	game->state = LL_GAME_STATE_STARTING;
+	static int is_first_call = 1;
 
-	ll_anim_activate(LL_ANIM_GAME_START);
-
-	return 1;
+	if(is_first_call)
+	{
+		game->state = LL_GAME_STATE_STARTING;
+		ll_anim_activate(LL_ANIM_GAME_START);
+		is_first_call = 0;
+		return 0;
+	}
+	else
+	{
+		if(ll_anim_is_active())
+		{
+			return 0;
+		}
+		is_first_call = 1;
+		return 1;
+	}
 }
 
 static enum game_result ll_game_run(struct game *game, uint64_t systime)
