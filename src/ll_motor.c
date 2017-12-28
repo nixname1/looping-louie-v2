@@ -16,7 +16,7 @@ void ll_motor_init(ll_motor_set_speed_cb set_speed_cb)
 void ll_motor_set_new_random_speed(void)
 {
     enum ll_motor_direction direction;
-    int rand_tmp;
+    long rand_tmp;
     uint32_t speed_percent;
 
     if(!mg_set_speed_cb)
