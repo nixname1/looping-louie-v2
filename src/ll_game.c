@@ -39,7 +39,7 @@ enum game_result
 	GAME_RESULT_END
 };
 
-void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrier, __unused uint64_t event_time, void *payload)
+void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrier, uint64_t event_time, void *payload)
 {
 	struct game *game = payload;
 
