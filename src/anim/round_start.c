@@ -10,26 +10,25 @@
 
 struct payload
 {
-    struct game *game;
     uint8_t step_count;
     uint8_t org_alpha[LL_LED_NUM_LEDS];
 	uint8_t alpha_step[LL_LED_NUM_LEDS];
     uint8_t padd1;
 };
 
-static void set_initial_led_colors(struct color *framebuffer, struct payload *p)
+static void set_initial_led_colors(struct color *framebuffer, struct game *game)
 {
-    ll_anim_round_run_generate_colors(framebuffer, p->game);
+    ll_anim_round_run_generate_colors(framebuffer, game);
 }
 
-static uint32_t start_animation(struct color *framebuffer, void *payload)
+static uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload)
 {
     struct payload *p = payload;
     uint32_t i;
 
     p->step_count = 0;
 
-    set_initial_led_colors(framebuffer, p);
+    set_initial_led_colors(framebuffer, game);
     for(i = 0; i < LL_LED_NUM_LEDS; i++)
     {
         p->org_alpha[i] = framebuffer[i].a;
@@ -39,8 +38,9 @@ static uint32_t start_animation(struct color *framebuffer, void *payload)
     return 1;
 }
 
-static uint32_t run_animation(struct color *framebuffer, void *payload)
+static uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload)
 {
+	(void)(game);
     struct payload *p = payload;
     uint32_t i;
 
@@ -58,22 +58,20 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
     return 0;
 }
 
-static uint32_t finish_animation(struct color *framebuffer, void *payload)
+static uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload)
 {
-    struct payload *p = payload;
-    ll_anim_round_run_generate_colors(framebuffer, p->game);
+	(void)(payload);
+    ll_anim_round_run_generate_colors(framebuffer, game);
     return 1;
 }
 
-struct animation *anim_round_start_init(struct color *framebuffer, struct game *game)
+struct animation *anim_round_start_init(struct color *framebuffer)
 {
     struct animation      *anim = malloc(sizeof(*anim));
     static struct payload p;
 
     if (!anim)
         return NULL;
-
-    p.game = game;
 
     anim->payload           = &p;
     anim->speed             = 60;

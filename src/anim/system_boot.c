@@ -1,7 +1,8 @@
 #include <stdlib.h>
 
-#include "ll_anim.h"
 #include "ll_led.h"
+#include "ll_anim.h"
+#include "ll_game.h"
 
 #include "anim/system_boot.h"
 
@@ -10,11 +11,9 @@ struct payload
     uint32_t bar_cnt;
     uint32_t ring_cnt;
 };
-
-uint32_t start_animation(struct color *framebuffer, void *payload);
-uint32_t run_animation(struct color *framebuffer, void *payload);
-uint32_t finish_animation(struct color *framebuffer, void *payload);
-
+uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload);
+uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload);
+uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload);
 
 static void set_initial_led_colors(struct color *framebuffer)
 {
@@ -50,8 +49,10 @@ static void set_initial_led_colors(struct color *framebuffer)
  * @param payload payload
  * @return 1 if finished, 0 if not yet
  */
-uint32_t start_animation(struct color *framebuffer, void *payload)
+uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload)
 {
+	(void)(game);
+
 	struct payload *p = payload;
 
     p->bar_cnt = 0;
@@ -67,8 +68,10 @@ uint32_t start_animation(struct color *framebuffer, void *payload)
  * @param payload payload
  * @return 1 if finished, 0 if not
  */
-uint32_t run_animation(struct color *framebuffer, void *payload)
+uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload)
 {
+	(void)(game);
+
     struct payload *p = payload;
 	uint32_t i;
 
@@ -99,8 +102,10 @@ uint32_t run_animation(struct color *framebuffer, void *payload)
  * @param payload payload
  * @return 1 if finished, 0 if not yet
  */
-uint32_t finish_animation(struct color *framebuffer, void *payload)
+uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload)
 {
+	(void)(game);
+
 	uint32_t ret = 0;
 	uint32_t i;
 	uint32_t zero_counter = 0;
@@ -115,7 +120,7 @@ uint32_t finish_animation(struct color *framebuffer, void *payload)
 		return 1;
 	}
 	// keep the animation running
-	run_animation(framebuffer, payload);
+	run_animation(framebuffer, game, payload);
 
 	return ret;
 }

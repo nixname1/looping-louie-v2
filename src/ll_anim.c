@@ -30,7 +30,7 @@ void ll_anim_init(render_frame_cb cb)
 /**
  * @brief runs the actual animation
  */
-void ll_anim_run(uint64_t system_time) {
+void ll_anim_run(uint64_t system_time, struct game *game) {
 	struct animation *anim = &mg_animations[mg_actual_animation];
     uint32_t ret;
 
@@ -49,7 +49,7 @@ void ll_anim_run(uint64_t system_time) {
     switch (mg_step) {
         case LL_ANIM_STEP_START:
             mg_state = LL_ANIM_STATE_STARTING;
-            ret = anim->start_animation(anim->framebuffer, anim->payload);
+            ret = anim->start_animation(anim->framebuffer, game, anim->payload);
             if (ret) {
                 mg_step = LL_ANIM_STEP_RUN;
             }
@@ -57,14 +57,14 @@ void ll_anim_run(uint64_t system_time) {
 
         case LL_ANIM_STEP_RUN:
             mg_state = LL_ANIM_STATE_RUNNING;
-            ret = anim->run_animation(anim->framebuffer, anim->payload);
+            ret = anim->run_animation(anim->framebuffer, game, anim->payload);
             if (mg_stop_request && ret) {
                 mg_step = LL_ANIM_STEP_FINISH;
             }
             break;
 
         case LL_ANIM_STEP_FINISH:
-            ret = anim->finish_animation(anim->framebuffer, anim->payload);
+            ret = anim->finish_animation(anim->framebuffer, game, anim->payload);
             if (ret) {
                 mg_state = LL_ANIM_STATE_FINISHED;
                 mg_step = LL_ANIM_STEP_DO_NOTHING;
@@ -110,7 +110,7 @@ void ll_anim_activate(enum LL_ANIMATION animation)
     mg_actual_animation = animation;
     mg_step = LL_ANIM_STEP_START;
     mg_is_active = 1;
-    mg_stop_request = !mg_animations[animation].is_loop_animation;
+    mg_stop_request = (uint32_t) !mg_animations[animation].is_loop_animation;
 }
 
 int32_t ll_anim_add(enum LL_ANIMATION anim_name, struct animation *anim)

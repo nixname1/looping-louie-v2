@@ -6,18 +6,6 @@
 #include "ll_motor.h"
 #include "ll_game.h"
 
-enum ll_system_step
-{
-	LL_SYSTEM_STEP_BOOT,
-	LL_SYSTEM_STEP_GAME_START,
-	LL_SYSTEM_STEP_GAME_RUN,
-	LL_SYSTEM_STEP_GAME_PAUSE,
-	LL_SYSTEM_STEP_GAME_EXIT,
-	LL_SYSTEM_STEP_WAIT_FOR_GAME_START,
-	LL_SYSTEM_STEP_SHUTDOWN,
-	LL_SYSTEM_STEP_ERROR
-};
-
 enum boot_step
 {
 	LL_BOOT_STEP_INIT,
@@ -261,70 +249,69 @@ static uint32_t ll_game_end(struct game *game)
     return 0;
 }
 
-void ll_game_loop_run(struct game *game, uint64_t systime)
+uint32_t ll_game_loop_run(struct game *game, uint64_t systime)
 {
-	static enum ll_system_step actual_system_step = LL_SYSTEM_STEP_BOOT;
-
 	ll_lb_run(systime, game);
-	ll_anim_run(systime);
+	ll_anim_run(systime, game);
 
-	switch (actual_system_step)
+	switch (game->game_step)
 	{
-		case LL_SYSTEM_STEP_BOOT:
+		case LL_GAME_STEP_BOOT:
 			if(run_system_boot(systime))
-				actual_system_step = LL_SYSTEM_STEP_WAIT_FOR_GAME_START;
+				game->game_step = LL_GAME_STEP_WAIT_FOR_GAME_START;
 			break;
 
-		case LL_SYSTEM_STEP_GAME_START:
+		case LL_GAME_STEP_GAME_START:
 			if(ll_game_start(game))
             {
-                actual_system_step = LL_SYSTEM_STEP_GAME_RUN;
+	            game->game_step = LL_GAME_STEP_GAME_RUN;
             }
 			break;
 
-		case LL_SYSTEM_STEP_GAME_RUN:
+		case LL_GAME_STEP_GAME_RUN:
 			switch(ll_game_run(game, systime))
 			{
 				case GAME_RESULT_PLAYING:
 					break;
 
 				case GAME_RESULT_PAUSED:
-					actual_system_step = LL_SYSTEM_STEP_GAME_PAUSE;
+					game->game_step = LL_GAME_STEP_GAME_PAUSE;
 					break;
 
 				case GAME_RESULT_END:
-					actual_system_step = LL_SYSTEM_STEP_GAME_EXIT;
+					game->game_step = LL_GAME_STEP_GAME_EXIT;
 					break;
 			}
 			break;
 
-		case LL_SYSTEM_STEP_GAME_PAUSE:
+		case LL_GAME_STEP_GAME_PAUSE:
 			if(ll_game_pause(game))
 			{
-				actual_system_step = LL_SYSTEM_STEP_GAME_RUN;
+				game->game_step = LL_GAME_STEP_GAME_RUN;
 			}
 			break;
 
-		case LL_SYSTEM_STEP_GAME_EXIT:
+		case LL_GAME_STEP_GAME_EXIT:
             if(ll_game_end(game))
             {
-                actual_system_step = LL_SYSTEM_STEP_BOOT;
+	            return 1;
             }
 			break;
 
-		case LL_SYSTEM_STEP_WAIT_FOR_GAME_START:
+		case LL_GAME_STEP_WAIT_FOR_GAME_START:
 			if(ll_switch_is_turned_on())
             {
-                actual_system_step = LL_SYSTEM_STEP_GAME_START;
+	            game->game_step = LL_GAME_STEP_GAME_START;
             }
 			break;
 
-		case LL_SYSTEM_STEP_ERROR:
+		case LL_GAME_STEP_ERROR:
 			break;
 
-		case LL_SYSTEM_STEP_SHUTDOWN:
+		case LL_GAME_STEP_SHUTDOWN:
 			break;
 	}
+	return 0;
 }
 
 struct game *ll_game_create(struct player *player, uint32_t player_count)
@@ -335,6 +322,7 @@ struct game *ll_game_create(struct player *player, uint32_t player_count)
 		return NULL;
 	}
 	game->state = LL_GAME_STATE_STOPPED;
+	game->game_step = LL_GAME_STEP_BOOT;
 	game->round_step = LL_ROUND_STEP_START;
 	game->motor_speed = 0;
 	game->player = player;

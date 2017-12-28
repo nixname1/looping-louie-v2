@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "ll_led.h"
+#include "ll_game.h"
 
 #define ANIMATION_FPS       (100)
 #define ANIMATION_DELAY_MS  ((uint32_t) 1000/ANIMATION_FPS)
@@ -15,7 +16,7 @@ enum anim_step
     LL_ANIM_STEP_DO_NOTHING,
 };
 
-typedef uint32_t (*animation_callback)(struct color *fb, void *payload);
+typedef uint32_t (*animation_callback)(struct color *fb, struct game *game, void *payload);
 typedef void (*render_frame_cb)(struct color *framebuffer);
 
 struct animation
@@ -46,7 +47,7 @@ enum LL_ANIMATION
 #define LL_ANIM_NUM_ANIMATIONS (9)
 
 void ll_anim_init(render_frame_cb cb);
-void ll_anim_run(uint64_t system_time);
+void ll_anim_run(uint64_t system_time, struct game *game);
 
 int32_t ll_anim_add(enum LL_ANIMATION anim_name, struct animation *anim);
 void ll_anim_activate(enum LL_ANIMATION animation);

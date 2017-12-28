@@ -4,6 +4,6 @@
 #include "ll_game.h"
 #include "ll_led.h"
 
-struct animation *anim_round_start_init(struct color *framebuffer, struct game *game);
+struct animation *anim_round_start_init(struct color *framebuffer);
 
 #endif

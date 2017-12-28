@@ -3,6 +3,7 @@
 
 #include "ll_led.h"
 #include "ll_anim.h"
+#include "ll_game.h"
 
 #include "anim/game_pause.h"
 
@@ -26,8 +27,9 @@ struct payload
     uint8_t padd1;
 };
 
-static uint32_t start_animation(struct color *framebuffer, void *payload)
+static uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload)
 {
+	(void)(game);
 	struct payload *p = payload;
 	p->step = STEP_DOWN;
 	p->step_count = 0;
@@ -47,8 +49,9 @@ static uint32_t start_animation(struct color *framebuffer, void *payload)
 	return 1;
 }
 
-static uint32_t run_animation(struct color *framebuffer, void *payload)
+static uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload)
 {
+	(void)(game);
 	static uint32_t wait_counter = 0;
 	struct payload *p = payload;
 
@@ -89,8 +92,10 @@ static uint32_t run_animation(struct color *framebuffer, void *payload)
 	return 1;
 }
 
-static uint32_t finish_animation(struct color *framebuffer, void *payload)
+static uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload)
 {
+	(void)(game);
+
 	struct payload *p = payload;
 	if (p->brightness_reference == p->brightest_value)
 	{
