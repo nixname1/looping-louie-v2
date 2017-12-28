@@ -104,8 +104,6 @@ uint32_t run_animation(struct color *framebuffer, struct game *game, void *paylo
  */
 uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload)
 {
-	(void)(game);
-
 	uint32_t ret = 0;
 	uint32_t i;
 	uint32_t zero_counter = 0;
