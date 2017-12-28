@@ -5,7 +5,7 @@
 #include "ll_led.h"
 #include "ll_anim.h"
 #include "ll_game.h"
-#include "anim/round_standby.h"
+#include "anim/round_wait_for_start.h"
 
 #define LONG_WAIT (90)
 #define SHORT_WAIT (30)
@@ -44,7 +44,7 @@ static uint32_t finish_animation(struct color *framebuffer, struct game *game, v
     return 1;
 }
 
-struct animation *anim_round_standby_init(struct color *framebuffer)
+struct animation *anim_round_wait_for_start_init(struct color *framebuffer)
 {
     struct animation      *anim = malloc(sizeof(*anim));
 

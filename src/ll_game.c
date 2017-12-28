@@ -116,7 +116,6 @@ static enum round_result run_round(struct game *game, uint64_t systime)
 		{
             game->player[i].lost_count++;
 			game->player_lost = &game->player[i];
-            ll_anim_activate(LL_ANIM_PLAYER_LOST);
 			return ROUND_RESULT_PLAYER_LOST;
 		}
 	}
@@ -180,6 +179,7 @@ static enum game_result ll_game_run(struct game *game, uint64_t systime)
 
 			    case ROUND_RESULT_PLAYER_LOST:
                     ll_motor_stop();
+				    ll_anim_activate(LL_ANIM_PLAYER_LOST);
 					game->round_step = LL_ROUND_STEP_END;
 				    break;
 
@@ -204,7 +204,7 @@ static enum game_result ll_game_run(struct game *game, uint64_t systime)
 		case LL_ROUND_STEP_WAIT_FOR_START:
 			if(!ll_anim_is_active())
 			{
-				ll_anim_activate(LL_ANIM_ROUND_STANDBY);
+				ll_anim_activate(LL_ANIM_ROUND_WAIT_FOR_START);
 			}
 			if(ll_switch_is_turned_on())
 			{

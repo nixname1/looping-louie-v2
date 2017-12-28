@@ -24,7 +24,7 @@
 #include "anim/game_pause.h"
 #include "anim/round_start.h"
 #include "anim/round_run.h"
-#include "anim/round_standby.h"
+#include "anim/round_wait_for_start.h"
 #include "anim/player_lost.h"
 
 #pragma GCC diagnostic push
