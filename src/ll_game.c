@@ -204,8 +204,7 @@ static enum game_result ll_game_run(struct game *game, uint64_t systime)
 		case LL_ROUND_STEP_WAIT_FOR_START:
 			if(!ll_anim_is_active())
 			{
-                // TODO: activate as soon as the animation is implemented
-				// ll_anim_activate(LL_ANIM_ROUND_STANDBY);
+				ll_anim_activate(LL_ANIM_ROUND_STANDBY);
 			}
 			if(ll_switch_is_turned_on())
 			{

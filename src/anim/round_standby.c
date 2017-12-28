@@ -13,10 +13,17 @@
 static uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload)
 {
     (void)(framebuffer);
-    (void)(game);
     (void)(payload);
 
-    return 1;
+	for (uint32_t i = 0; i < game->player_count; ++i)
+	{
+		for (uint32_t j = 0; j < game->player[i].lost_count; ++j)
+		{
+			ll_led_set_pixel_for_player(framebuffer, ll_player_get_color(i), j, i);
+		}
+	}
+
+	return 1;
 }
 
 static uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload)
