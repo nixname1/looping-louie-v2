@@ -52,7 +52,7 @@ struct animation *anim_round_wait_for_start_init(struct color *framebuffer)
         return NULL;
 
     anim->payload           = NULL;
-    anim->speed             = 60;
+    anim->speed             = 25;
     anim->is_loop_animation = 1;
     anim->start_animation   = start_animation;
     anim->run_animation     = run_animation;
