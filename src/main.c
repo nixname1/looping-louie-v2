@@ -17,6 +17,7 @@
 #include "hardware/ll_74hc166.h"
 #include "hardware/ll_gpio.h"
 #include "hardware/ll_system.h"
+#include "hardware/ll_pwm.h"
 
 #include "anim/system_boot.h"
 #include "anim/game_start.h"
@@ -31,6 +32,7 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+
 int main(int argc, char *argv[])
 {
     UNUSED(argc);
@@ -46,7 +48,8 @@ int main(int argc, char *argv[])
 #endif
 	ll_system_init();
     ll_system_random_init();
-    ll_motor_init();
+	ll_pwm_init();
+    ll_motor_init(ll_pwm_set_speed_in_percent);
     ll_74hc166_init();
     ll_gpio_init();
     ll_switch_init(ll_gpio_get_switch_state);

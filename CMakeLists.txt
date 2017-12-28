@@ -69,6 +69,7 @@ set(SOURCE_FILES
     src/hardware/ll_gpio.c
     src/hardware/ll_74hc166.c
     src/hardware/ll_renderer.c
+    src/hardware/ll_pwm.c
     src/stm32f4xx_hal_msp.c
     system/src/cmsis/system_stm32f4xx.c
     system/src/cmsis/vectors_stm32f411xe.c

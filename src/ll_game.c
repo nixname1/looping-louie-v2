@@ -13,7 +13,7 @@ enum ll_system_step
 	LL_SYSTEM_STEP_GAME_RUN,
 	LL_SYSTEM_STEP_GAME_PAUSE,
 	LL_SYSTEM_STEP_GAME_EXIT,
-	LL_SYSTEM_STEP_STANDBY,
+	LL_SYSTEM_STEP_WAIT_FOR_GAME_START,
 	LL_SYSTEM_STEP_SHUTDOWN,
 	LL_SYSTEM_STEP_ERROR
 };
@@ -42,6 +42,8 @@ enum game_result
 void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrier, uint64_t event_time, void *payload)
 {
 	struct game *game = payload;
+
+	(void)(event_time);
 
 	if(event == LL_EXT_EVENT_START)
 	{
@@ -104,13 +106,11 @@ static uint32_t start_new_round(struct game *game)
     return 1;
 }
 
-static enum round_result run_round(struct game *game)
+static enum round_result run_round(struct game *game, uint64_t systime)
 {
     enum round_result ret = ROUND_RESULT_PLAYING;
 
-	// TODO: run motor here
-
-    ll_motor_run();
+    ll_motor_run(systime);
 
 	if(!ll_switch_is_turned_on())
 	{
@@ -157,7 +157,7 @@ static uint32_t ll_game_start(struct game *game)
 	return 1;
 }
 
-static enum game_result ll_game_run(struct game *game)
+static enum game_result ll_game_run(struct game *game, uint64_t systime)
 {
 	enum game_result ret = GAME_RESULT_PLAYING;
 	game->state = LL_GAME_STATE_RUNNING;
@@ -172,7 +172,7 @@ static enum game_result ll_game_run(struct game *game)
             break;
 
         case LL_ROUND_STEP_RUN:
-		    switch(run_round(game))
+		    switch(run_round(game, systime))
 		    {
 			    case ROUND_RESULT_PLAYING:
 				    break;
@@ -259,7 +259,7 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 	{
 		case LL_SYSTEM_STEP_BOOT:
 			if(run_system_boot(systime))
-				actual_system_step = LL_SYSTEM_STEP_STANDBY;
+				actual_system_step = LL_SYSTEM_STEP_WAIT_FOR_GAME_START;
 			break;
 
 		case LL_SYSTEM_STEP_GAME_START:
@@ -270,7 +270,7 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 			break;
 
 		case LL_SYSTEM_STEP_GAME_RUN:
-			switch(ll_game_run(game))
+			switch(ll_game_run(game, systime))
 			{
 				case GAME_RESULT_PLAYING:
 					break;
@@ -295,11 +295,11 @@ void ll_game_loop_run(struct game *game, uint64_t systime)
 		case LL_SYSTEM_STEP_GAME_EXIT:
             if(ll_game_end(game))
             {
-                actual_system_step = LL_SYSTEM_STEP_STANDBY;
+                actual_system_step = LL_SYSTEM_STEP_BOOT;
             }
 			break;
 
-		case LL_SYSTEM_STEP_STANDBY:
+		case LL_SYSTEM_STEP_WAIT_FOR_GAME_START:
 			if(ll_switch_is_turned_on())
             {
                 actual_system_step = LL_SYSTEM_STEP_GAME_START;
