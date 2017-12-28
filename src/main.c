@@ -39,8 +39,7 @@ int main(int argc, char *argv[])
     UNUSED(argv);
 
     struct color *framebuffer;
-	struct game *game;
-    struct player *player;
+	struct game *game = NULL;
 
 #ifdef DEBUG
 	trace_printf("SystemCoreClock: %lu\n", SystemCoreClock);
@@ -72,19 +71,23 @@ int main(int argc, char *argv[])
 
     ll_lb_init(ll_74hc166_read_data, ll_game_lb_event_callback);
 
-    player = malloc(sizeof(*player) * LL_PLAYER_NUM_PLAYERS);
-    for(uint32_t i = 0; i < LL_PLAYER_NUM_PLAYERS; i++)
-    {
-        player[i].number = i;
-        player[i].chips = 3;
-        player[i].color = ll_player_get_color(i);
-        player[i].lost_count = 0;
-    }
-	game = ll_game_create(player, LL_PLAYER_NUM_PLAYERS);
-
     while (1)
     {
-	    ll_game_loop_run(game,ll_system_get_systime());
+	    if(game == NULL)
+	    {
+		    game = ll_game_create();
+	    }
+	    else
+	    {
+		    uint32_t ret = ll_game_loop_run(game, ll_system_get_systime());
+		    if (ret)
+		    {
+			    free(game->player);
+			    free(game);
+			    game = NULL;
+		    }
+	    }
+
     }
 }
 #pragma clang diagnostic pop

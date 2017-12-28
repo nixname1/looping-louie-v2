@@ -49,7 +49,7 @@ struct game
 
 void ll_game_lb_event_callback(enum ll_lb_event_type event, uint32_t lightbarrier, uint64_t event_time, void *payload);
 
-struct game *ll_game_create(struct player *player, uint32_t player_count);
+struct game *ll_game_create(void);
 uint32_t ll_game_loop_run(struct game *game, uint64_t systime);
 
 #endif //LL_GAME_H

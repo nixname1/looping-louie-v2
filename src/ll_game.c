@@ -313,19 +313,30 @@ uint32_t ll_game_loop_run(struct game *game, uint64_t systime)
 	return 0;
 }
 
-struct game *ll_game_create(struct player *player, uint32_t player_count)
+struct game *ll_game_create()
 {
 	struct game *game = malloc(sizeof(*game));
-	if(!game)
+	struct player *player = malloc(sizeof(*player) * LL_PLAYER_NUM_PLAYERS);
+
+	if(!game || !player)
 	{
 		return NULL;
 	}
+
+	for(uint32_t i = 0; i < LL_PLAYER_NUM_PLAYERS; i++)
+	{
+		player[i].number = i;
+		player[i].chips = 3;
+		player[i].color = ll_player_get_color(i);
+		player[i].lost_count = 0;
+	}
+
 	game->state = LL_GAME_STATE_STOPPED;
 	game->game_step = LL_GAME_STEP_BOOT;
 	game->round_step = LL_ROUND_STEP_START;
 	game->motor_speed = 0;
 	game->player = player;
-	game->player_count = player_count;
+	game->player_count = LL_PLAYER_NUM_PLAYERS;
 	game->round_counter = 0;
 	return game;
 }
