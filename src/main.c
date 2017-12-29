@@ -26,6 +26,7 @@
 #include "anim/round_run.h"
 #include "anim/round_wait_for_start.h"
 #include "anim/player_lost.h"
+#include "anim/player_lost_alone.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
@@ -65,6 +66,7 @@ int main(int argc, char *argv[])
     ll_anim_add(LL_ANIM_GAME_START, anim_game_start_init(framebuffer));
     ll_anim_add(LL_ANIM_GAME_PAUSE, anim_game_pause_init(framebuffer));
     ll_anim_add(LL_ANIM_PLAYER_LOST, anim_player_lost_init(framebuffer));
+	ll_anim_add(LL_ANIM_PLAYER_LOST_ALONE, anim_player_lost_alone_init(framebuffer));
     ll_anim_add(LL_ANIM_ROUND_START, anim_round_start_init(framebuffer));
     ll_anim_add(LL_ANIM_ROUND_RUN, anim_round_run_init(framebuffer));
     ll_anim_add(LL_ANIM_ROUND_WAIT_FOR_START, anim_round_wait_for_start_init(framebuffer));

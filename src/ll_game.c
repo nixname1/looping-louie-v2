@@ -160,6 +160,7 @@ static uint32_t ll_game_start(struct game *game)
 static enum game_result ll_game_run(struct game *game, uint64_t systime)
 {
 	enum game_result ret = GAME_RESULT_PLAYING;
+	int player_lost_alone = 0;
 	game->state = LL_GAME_STATE_RUNNING;
 
     switch(game->round_step)
@@ -179,7 +180,30 @@ static enum game_result ll_game_run(struct game *game, uint64_t systime)
 
 			    case ROUND_RESULT_PLAYER_LOST:
                     ll_motor_stop();
-				    ll_anim_activate(LL_ANIM_PLAYER_LOST);
+				    for (uint32_t i = 0; i < game->player_count; ++i)
+				    {
+						if(game->player[i].chips == 3)
+					    {
+						    player_lost_alone = 1;
+					    }
+						else if(game->player[i].number == game->player_lost->number)
+					    {
+						    continue;
+					    }
+						else
+						{
+							player_lost_alone = 0;
+							break;
+						}
+				    }
+				    if(player_lost_alone)
+				    {
+					    ll_anim_activate(LL_ANIM_PLAYER_LOST_ALONE);
+				    }
+				    else
+				    {
+					    ll_anim_activate(LL_ANIM_PLAYER_LOST);
+				    }
 					game->round_step = LL_ROUND_STEP_END;
 				    break;
 
