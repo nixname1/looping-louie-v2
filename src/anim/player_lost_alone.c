@@ -72,7 +72,7 @@ static void set_initial_led_colors(struct color *framebuffer, struct game *game,
     ll_led_set_pixel_for_player(framebuffer, &RED, game->player[p->player_lost].lost_count - 1, p->player_lost);
     ll_led_set_circle_color_for_player(framebuffer, &RED, p->player_lost);
 
-	for(int i = 0; i < game->player_count; i++)
+	for(uint32_t i = 0; i < game->player_count; i++)
 	{
 		ll_led_stripe_set_complete_player(framebuffer, &RED, i);
 	}
