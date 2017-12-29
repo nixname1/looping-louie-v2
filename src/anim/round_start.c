@@ -31,10 +31,18 @@ static uint32_t start_animation(struct color *framebuffer, struct game *game, in
     set_initial_led_colors(framebuffer, game);
     for(i = 0; i < LL_LED_NUM_LEDS; i++)
     {
-        p->org_alpha[i] = framebuffer[i].a;
-        p->alpha_step[i] = framebuffer[i].a / STEPS;
-        ll_led_set_alpha(framebuffer, 0, i);
+	    p->org_alpha[i]  = framebuffer[i].a;
+	    if(((i % LL_LED_NUM_BAR_CIRCLE_PER_PLAYER) >= LL_LED_NUM_PER_BAR && i < LL_LED_NUM_ALL_BARS_CIRCLES) || i >= LL_LED_NUM_ALL_BARS_CIRCLES)
+	    {
+		    p->alpha_step[i] = framebuffer[i].a / STEPS;
+		    ll_led_set_alpha(framebuffer, 0, i);
+	    }
+	    else
+	    {
+		    p->alpha_step[i] = 0;
+	    }
     }
+
     *render_request = 1;
     return 1;
 }
@@ -45,7 +53,7 @@ static uint32_t run_animation(struct color *framebuffer, struct game *game, int 
     struct payload *p = payload;
     uint32_t i;
 
-    for(i = 0; i < LL_LED_NUM_LEDS; i++)
+	for(i = 0; i < LL_LED_NUM_LEDS; i++)
     {
         framebuffer[i].a = (uint8_t) (framebuffer[i].a + p->alpha_step[i]);
     }
