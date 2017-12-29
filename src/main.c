@@ -22,6 +22,7 @@
 #include "anim/system_boot.h"
 #include "anim/game_start.h"
 #include "anim/game_pause.h"
+#include "anim/game_exit.h"
 #include "anim/round_start.h"
 #include "anim/round_run.h"
 #include "anim/round_wait_for_start.h"
@@ -65,6 +66,7 @@ int main(int argc, char *argv[])
     ll_anim_add(LL_ANIM_SYSTEM_BOOT, anim_system_boot_init(framebuffer));
     ll_anim_add(LL_ANIM_GAME_START, anim_game_start_init(framebuffer));
     ll_anim_add(LL_ANIM_GAME_PAUSE, anim_game_pause_init(framebuffer));
+    ll_anim_add(LL_ANIM_GAME_EXIT, anim_game_exit_init(framebuffer));
     ll_anim_add(LL_ANIM_PLAYER_LOST, anim_player_lost_init(framebuffer));
 	ll_anim_add(LL_ANIM_PLAYER_LOST_ALONE, anim_player_lost_alone_init(framebuffer));
     ll_anim_add(LL_ANIM_ROUND_START, anim_round_start_init(framebuffer));
