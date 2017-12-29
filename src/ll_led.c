@@ -138,7 +138,7 @@ void ll_led_set_circle_color_for_player(struct color *framebuffer, struct color 
  * @param   player      the number of the player to set the leds for
  * @warning new_pixel has to hold minimum LL_LED_NUM_PER_PLAYER colors!
  */
-void ll_led_set_pixel_for_player(struct color *framebuffer, struct color *new_pixel, uint32_t pixel_number, uint32_t player)
+void ll_led_set_pixel_for_player(struct color *framebuffer, const struct color *new_pixel, uint32_t pixel_number, uint32_t player)
 {
     memcpy(&framebuffer[player * LL_LED_NUM_PER_PLAYER + pixel_number], new_pixel, sizeof(*framebuffer));
 }

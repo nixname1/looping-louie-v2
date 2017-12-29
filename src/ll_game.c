@@ -125,12 +125,51 @@ static enum round_result run_round(struct game *game, uint64_t systime)
 
 static uint32_t end_round(struct game *game)
 {
+	static int is_first_call = 1;
     uint32_t ret = 0;
-	if(!ll_switch_is_turned_on())
+	int player_lost_alone = 0;
+
+	if(is_first_call)
 	{
-		ret = 1;
-		game->round_counter++;
-		ll_anim_stop_animation();
+		is_first_call = 0;
+		for (uint32_t i = 0; i < game->player_count; ++i)
+		{
+			if(game->player[i].chips == 3)
+			{
+				player_lost_alone = 1;
+			}
+			else if(game->player[i].number == game->player_lost->number)
+			{
+				continue;
+			}
+			else
+			{
+				player_lost_alone = 0;
+				break;
+			}
+		}
+		if(game->player_lost->lost_count >= LL_LED_NUM_PER_BAR)
+		{
+			ll_anim_activate(LL_ANIM_GAME_EXIT);
+		}
+		else if(player_lost_alone)
+		{
+			ll_anim_activate(LL_ANIM_PLAYER_LOST_ALONE);
+		}
+		else
+		{
+			ll_anim_activate(LL_ANIM_PLAYER_LOST);
+		}
+	}
+	else
+	{
+		if (!ll_switch_is_turned_on())
+		{
+			ret = 1;
+			game->round_counter++;
+			is_first_call = 1;
+			ll_anim_stop_animation();
+		}
 	}
     return ret;
 }
@@ -160,7 +199,6 @@ static uint32_t ll_game_start(struct game *game)
 static enum game_result ll_game_run(struct game *game, uint64_t systime)
 {
 	enum game_result ret = GAME_RESULT_PLAYING;
-	int player_lost_alone = 0;
 	game->state = LL_GAME_STATE_RUNNING;
 
     switch(game->round_step)
@@ -180,30 +218,6 @@ static enum game_result ll_game_run(struct game *game, uint64_t systime)
 
 			    case ROUND_RESULT_PLAYER_LOST:
                     ll_motor_stop();
-				    for (uint32_t i = 0; i < game->player_count; ++i)
-				    {
-						if(game->player[i].chips == 3)
-					    {
-						    player_lost_alone = 1;
-					    }
-						else if(game->player[i].number == game->player_lost->number)
-					    {
-						    continue;
-					    }
-						else
-						{
-							player_lost_alone = 0;
-							break;
-						}
-				    }
-				    if(player_lost_alone)
-				    {
-					    ll_anim_activate(LL_ANIM_PLAYER_LOST_ALONE);
-				    }
-				    else
-				    {
-					    ll_anim_activate(LL_ANIM_PLAYER_LOST);
-				    }
 					game->round_step = LL_ROUND_STEP_END;
 				    break;
 

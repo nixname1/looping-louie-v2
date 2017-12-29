@@ -31,6 +31,7 @@ static uint32_t start_animation(struct color *framebuffer, struct game *game, in
 {
 	(void)(game);
 	(void)(render_request);
+
 	struct payload *p = payload;
 	p->step = STEP_DOWN;
 	p->step_count = 0;
