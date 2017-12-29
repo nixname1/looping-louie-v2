@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     ll_anim_add(LL_ANIM_PLAYER_LOST, anim_player_lost_init(framebuffer));
     ll_anim_add(LL_ANIM_ROUND_START, anim_round_start_init(framebuffer));
     ll_anim_add(LL_ANIM_ROUND_RUN, anim_round_run_init(framebuffer));
-    ll_anim_add(LL_ANIM_ROUND_STANDBY, anim_round_standby_init(framebuffer));
+    ll_anim_add(LL_ANIM_ROUND_WAIT_FOR_START, anim_round_wait_for_start_init(framebuffer));
 
     ll_lb_init(ll_74hc166_read_data, ll_game_lb_event_callback);
 
