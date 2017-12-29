@@ -10,7 +10,7 @@
 #define LONG_WAIT (90)
 #define SHORT_WAIT (30)
 
-static uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t start_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
     (void)(framebuffer);
     (void)(payload);
@@ -23,22 +23,26 @@ static uint32_t start_animation(struct color *framebuffer, struct game *game, vo
 		}
 	}
 
+	*render_request = 1;
+
 	return 1;
 }
 
-static uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t run_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
     (void)(framebuffer);
     (void)(game);
+    (void)(render_request);
     (void)(payload);
 
     return 1;
 }
 
-static uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t finish_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
     (void)(framebuffer);
     (void)(game);
+    (void)(render_request);
     (void)(payload);
 
     return 1;

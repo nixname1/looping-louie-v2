@@ -21,7 +21,7 @@ static void set_initial_led_colors(struct color *framebuffer, struct game *game)
     ll_anim_round_run_generate_colors(framebuffer, game);
 }
 
-static uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t start_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
     struct payload *p = payload;
     uint32_t i;
@@ -35,10 +35,11 @@ static uint32_t start_animation(struct color *framebuffer, struct game *game, vo
         p->alpha_step[i] = framebuffer[i].a / STEPS;
         ll_led_set_alpha(framebuffer, 0, i);
     }
+    *render_request = 1;
     return 1;
 }
 
-static uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t run_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	(void)(game);
     struct payload *p = payload;
@@ -49,6 +50,8 @@ static uint32_t run_animation(struct color *framebuffer, struct game *game, void
         framebuffer[i].a = (uint8_t) (framebuffer[i].a + p->alpha_step[i]);
     }
 
+    *render_request = 1;
+
     if(p->step_count >= STEPS)
     {
         return 1;
@@ -58,10 +61,11 @@ static uint32_t run_animation(struct color *framebuffer, struct game *game, void
     return 0;
 }
 
-static uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t finish_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	(void)(payload);
     ll_anim_round_run_generate_colors(framebuffer, game);
+    *render_request = 1;
     return 1;
 }
 

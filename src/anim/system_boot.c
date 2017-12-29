@@ -11,9 +11,9 @@ struct payload
     uint32_t bar_cnt;
     uint32_t ring_cnt;
 };
-uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload);
-uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload);
-uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload);
+uint32_t start_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload);
+uint32_t run_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload);
+uint32_t finish_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload);
 
 static void set_initial_led_colors(struct color *framebuffer)
 {
@@ -49,7 +49,7 @@ static void set_initial_led_colors(struct color *framebuffer)
  * @param payload payload
  * @return 1 if finished, 0 if not yet
  */
-uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload)
+uint32_t start_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	(void)(game);
 
@@ -60,6 +60,7 @@ uint32_t start_animation(struct color *framebuffer, struct game *game, void *pay
 	ll_led_clear_all_pixel(framebuffer);
 	set_initial_led_colors(framebuffer);
 
+	*render_request = 1;
 	return 1;
 }
 
@@ -68,7 +69,7 @@ uint32_t start_animation(struct color *framebuffer, struct game *game, void *pay
  * @param payload payload
  * @return 1 if finished, 0 if not
  */
-uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload)
+uint32_t run_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	(void)(game);
 
@@ -85,6 +86,7 @@ uint32_t run_animation(struct color *framebuffer, struct game *game, void *paylo
             ll_led_shift_player_circle_right(framebuffer, i);
         }
         p->ring_cnt = 0;
+	    *render_request = 1;
     }
     if(p->bar_cnt >= 3)
     {
@@ -93,6 +95,7 @@ uint32_t run_animation(struct color *framebuffer, struct game *game, void *paylo
             ll_led_shift_player_bar_down(framebuffer, i);
         }
         p->bar_cnt = 0;
+	    *render_request = 1;
     }
 	return 1;
 }
@@ -102,7 +105,7 @@ uint32_t run_animation(struct color *framebuffer, struct game *game, void *paylo
  * @param payload payload
  * @return 1 if finished, 0 if not yet
  */
-uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload)
+uint32_t finish_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	uint32_t ret = 0;
 	uint32_t i;
@@ -113,12 +116,13 @@ uint32_t finish_animation(struct color *framebuffer, struct game *game, void *pa
 	{
 		zero_counter += ll_led_fade_leds_for_player(framebuffer, i, LL_LED_FADE_DIR_OUT, 5, 3);
 	}
+	*render_request = 1;
 	if(zero_counter >= LL_LED_NUM_ALL_BARS_CIRCLES)
 	{
 		return 1;
 	}
 	// keep the animation running
-	run_animation(framebuffer, game, payload);
+	run_animation(framebuffer, game, render_request, payload);
 
 	return ret;
 }

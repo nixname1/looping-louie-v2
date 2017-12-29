@@ -33,6 +33,7 @@ void ll_anim_init(render_frame_cb cb)
 void ll_anim_run(uint64_t system_time, struct game *game) {
 	struct animation *anim = &mg_animations[mg_actual_animation];
     uint32_t ret;
+    int render_request = 0;
 
     if (!mg_is_active)
         return;
@@ -49,7 +50,7 @@ void ll_anim_run(uint64_t system_time, struct game *game) {
     switch (mg_step) {
         case LL_ANIM_STEP_START:
             mg_state = LL_ANIM_STATE_STARTING;
-            ret = anim->start_animation(anim->framebuffer, game, anim->payload);
+            ret = anim->start_animation(anim->framebuffer, game, &render_request, anim->payload);
             if (ret) {
                 mg_step = LL_ANIM_STEP_RUN;
             }
@@ -57,14 +58,14 @@ void ll_anim_run(uint64_t system_time, struct game *game) {
 
         case LL_ANIM_STEP_RUN:
             mg_state = LL_ANIM_STATE_RUNNING;
-            ret = anim->run_animation(anim->framebuffer, game, anim->payload);
+            ret = anim->run_animation(anim->framebuffer, game, &render_request, anim->payload);
             if (mg_stop_request && ret) {
                 mg_step = LL_ANIM_STEP_FINISH;
             }
             break;
 
         case LL_ANIM_STEP_FINISH:
-            ret = anim->finish_animation(anim->framebuffer, game, anim->payload);
+            ret = anim->finish_animation(anim->framebuffer, game, &render_request, anim->payload);
             if (ret) {
                 mg_state = LL_ANIM_STATE_FINISHED;
                 mg_step = LL_ANIM_STEP_DO_NOTHING;
@@ -78,7 +79,7 @@ void ll_anim_run(uint64_t system_time, struct game *game) {
             break;
     }
 
-	if(render_cb)
+	if(render_request && render_cb)
 	{
 		render_cb(anim->framebuffer);
 	}

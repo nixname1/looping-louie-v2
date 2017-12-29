@@ -27,9 +27,10 @@ struct payload
     uint8_t padd1;
 };
 
-static uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t start_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	(void)(game);
+	(void)(render_request);
 	struct payload *p = payload;
 	p->step = STEP_DOWN;
 	p->step_count = 0;
@@ -49,7 +50,7 @@ static uint32_t start_animation(struct color *framebuffer, struct game *game, vo
 	return 1;
 }
 
-static uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t run_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	(void)(game);
 	static uint32_t wait_counter = 0;
@@ -89,10 +90,11 @@ static uint32_t run_animation(struct color *framebuffer, struct game *game, void
 			p->brightness_reference = (uint8_t) (p->brightness_reference + p->alpha_step[LL_LED_NUM_LEDS]);
 			break;
 	}
+	*render_request = 1;
 	return 1;
 }
 
-static uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t finish_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	(void)(game);
 
@@ -108,6 +110,7 @@ static uint32_t finish_animation(struct color *framebuffer, struct game *game, v
 	}
 	p->brightness_reference = (uint8_t) (p->brightness_reference + p->alpha_step[LL_LED_NUM_LEDS]);
 
+	*render_request = 1;
 	return 0;
 }
 

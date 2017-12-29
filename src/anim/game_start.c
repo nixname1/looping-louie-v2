@@ -12,19 +12,20 @@ struct payload
 	uint32_t led_counter;
 };
 
-static uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t start_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	struct payload *p = payload;
 
 	(void)(framebuffer);
 	(void)(game);
+	(void)(render_request);
 
 	p->led_counter = 0;
 
     return 1;
 }
 
-static uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t run_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	(void)(game);
 
@@ -69,13 +70,15 @@ static uint32_t run_animation(struct color *framebuffer, struct game *game, void
         ring_cnt++;
 	}
 	p->led_counter++;
+	*render_request = 1;
 	return 0;
 }
 
-static uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t finish_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	(void)(framebuffer);
 	(void) (game);
+	(void)(render_request);
 	(void)(payload);
 
     return 1;

@@ -16,7 +16,7 @@ enum anim_step
     LL_ANIM_STEP_DO_NOTHING,
 };
 
-typedef uint32_t (*animation_callback)(struct color *fb, struct game *game, void *payload);
+typedef uint32_t (*animation_callback)(struct color *fb, struct game *game, int *render_request, void *payload);
 typedef void (*render_frame_cb)(struct color *framebuffer);
 
 struct animation
@@ -44,7 +44,7 @@ enum LL_ANIMATION
 	LL_ANIM_ROUND_WAIT_FOR_START = 9
 };
 
-#define LL_ANIM_NUM_ANIMATIONS (9)
+#define LL_ANIM_NUM_ANIMATIONS (10)
 
 void ll_anim_init(render_frame_cb cb);
 void ll_anim_run(uint64_t system_time, struct game *game);

@@ -40,27 +40,29 @@ void ll_anim_round_run_generate_colors(struct color *framebuffer, struct game *g
     }
 }
 
-static uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t start_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
     (void)(framebuffer);
     (void)(game);
+    (void)(render_request);
     (void)(payload);
 
     return 1;
 }
 
-static uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t run_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	(void)(payload);
     ll_anim_round_run_generate_colors(framebuffer, game);
-
+	*render_request = 1;
     return 1;
 }
 
-static uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t finish_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
     (void)(framebuffer);
     (void)(game);
+    (void)(render_request);
     (void)(payload);
 
     return 1;

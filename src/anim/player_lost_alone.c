@@ -78,7 +78,7 @@ static void set_initial_led_colors(struct color *framebuffer, struct game *game,
 	}
 }
 
-static uint32_t start_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t start_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
     struct payload *p = payload;
     uint32_t i;
@@ -94,11 +94,13 @@ static uint32_t start_animation(struct color *framebuffer, struct game *game, vo
 
     set_initial_led_colors(framebuffer, game, p);
 
+	*render_request = 1;
+
     p->run_step = STEP_FADE;
     return 1;
 }
 
-static uint32_t run_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t run_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
     static uint32_t blink_state = 0;
     static uint32_t blink_step = 1;
@@ -109,6 +111,7 @@ static uint32_t run_animation(struct color *framebuffer, struct game *game, void
     {
         case STEP_FADE:
             fade_leds(framebuffer, game, p);
+		    *render_request = 1;
             if (p->zero_counter >= LL_LED_NUM_PER_PLAYER * (game->player_count -1))
             {
                 blink_state = 1;
@@ -122,6 +125,7 @@ static uint32_t run_animation(struct color *framebuffer, struct game *game, void
                 wait_tm--;
                 return (blink_state) ? 0: 1;
             }
+		    *render_request = 1;
             switch(blink_step)
             {
                 case 1:
@@ -172,11 +176,12 @@ static uint32_t run_animation(struct color *framebuffer, struct game *game, void
     return blink_state;
 }
 
-static uint32_t finish_animation(struct color *framebuffer, struct game *game, void *payload)
+static uint32_t finish_animation(struct color *framebuffer, struct game *game, int *render_request, void *payload)
 {
 	(void)(game);
     struct payload *p = payload;
     ll_led_clear_all_pixel_of_player(framebuffer, p->player_lost);
+	*render_request = 1;
     return 1;
 }
 
