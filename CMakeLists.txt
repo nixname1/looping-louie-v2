@@ -62,6 +62,7 @@ set(SOURCE_FILES
     src/anim/system_boot.c
     src/anim/game_start.c
     src/anim/game_pause.c
+    src/anim/game_exit.c
     src/anim/player_lost.c
     src/anim/player_lost_alone.c
     src/anim/round_start.c
