@@ -1,7 +1,12 @@
 
+.idea/workspace.xml
+.settings
 Debug/
 Release/
 *.o
 *.d
 *.hex
 *.elf
+*.swp
+cmake-build-*
+build/
